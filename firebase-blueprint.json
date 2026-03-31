@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "Business": {
+      "title": "Business",
+      "description": "A business profile for an SME.",
+      "type": "object",
+      "properties": {
+        "businessName": { "type": "string" },
+        "sector": { "type": "string", "enum": ["general", "legal", "medical", "financial", "education"] },
+        "vatRegistered": { "type": "boolean" },
+        "employeeCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["businessName", "sector", "ownerId"]
+    },
+    "ComplianceItem": {
+      "title": "Compliance Item",
+      "description": "A specific compliance task or requirement.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "legalReference": { "type": "string" },
+        "status": { "type": "string", "enum": ["compliant", "action_required", "expiring_soon", "overdue"] },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "expiryDate": { "type": "string", "format": "date-time" },
+        "evidenceUrls": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" },
+        "completedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "category", "title", "status"]
+    },
+    "Alert": {
+      "title": "Alert",
+      "description": "A notification for a compliance item.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "complianceItemId": { "type": "string" },
+        "type": { "type": "string", "enum": ["due_soon", "overdue", "expiring"] },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "complianceItemId", "type", "message", "read"]
+    }
+  },
+  "firestore": {
+    "/businesses/{userId}": {
+      "schema": "Business",
+      "description": "Business profiles indexed by user ID."
+    },
+    "/complianceItems/{itemId}": {
+      "schema": "ComplianceItem",
+      "description": "Compliance tasks for all businesses."
+    },
+    "/alerts/{alertId}": {
+      "schema": "Alert",
+      "description": "User notifications."
+    }
+  }
+}

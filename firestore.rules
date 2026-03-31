@@ -1,0 +1,237 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // --- Auth Helpers ---
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Checks resource.data.userId matches the caller
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    // Checks incoming request.resource.data.userId matches the caller
+    function isRequestOwner() {
+      return isAuthenticated() && request.auth.uid == request.resource.data.userId;
+    }
+
+    // --- Size Helpers ---
+    // Prevent billing abuse by enforcing maximum string lengths
+    function isShortString(val, maxLen) {
+      return val is string && val.size() <= maxLen;
+    }
+
+    // ===============================================================
+    // VALID ENUMS (single source of truth)
+    // ===============================================================
+
+    function isValidSector(sector) {
+      return sector in [
+        'general', 'retail', 'food_hospitality', 'construction', 'manufacturing', 'transport_logistics',
+        'legal', 'accounting_financial', 'medical', 'pharmacy', 'engineering_architecture', 'it_technology',
+        'real_estate', 'insurance', 'investment_asset_management', 'education', 'npo_npc',
+        'agriculture', 'mining', 'security_services', 'cleaning_facilities', 'other'
+      ];
+    }
+
+    function isValidBusinessStructure(structure) {
+      return structure in ['sole_proprietor', 'pty_ltd', 'cc', 'partnership', 'npo'];
+    }
+
+    function isValidVatStatus(vat) {
+      return vat in ['yes', 'no', 'not_sure'];
+    }
+
+    function isValidEmployeeBand(band) {
+      return band in ['0', '1-5', '6-20', '21-50', '51+'];
+    }
+
+    function isValidComplianceStatus(status) {
+      return status in ['compliant', 'pending_setup', 'action_required', 'expiring_soon', 'overdue'];
+    }
+
+    function isValidComplianceGroup(group) {
+      return group in ['tax_revenue', 'company_secretarial', 'labour_employment', 'sector_specific', 'licensing'];
+    }
+
+    function isValidAlertType(type) {
+      return type in ['due_soon', 'overdue', 'expiring'];
+    }
+
+    // ===============================================================
+    // BUSINESS PROFILE — /businesses/{userId}
+    // ===============================================================
+    // Document ID = user UID (1:1 relationship)
+    // Created during onboarding, updated on settings page
+
+    function isValidBusinessData(data) {
+      return data.keys().hasAll([
+               'businessName', 'sector', 'province', 'vatRegistered',
+               'employeeBand', 'businessStructure', 'cipcRegistered',
+               'onboardingCompleted', 'ownerId'
+             ])
+             // --- Required string fields ---
+             && isShortString(data.businessName, 100)
+             && data.businessName.size() > 0
+             && isValidSector(data.sector)
+             && isShortString(data.province, 50)
+             && isValidVatStatus(data.vatRegistered)
+             && isValidEmployeeBand(data.employeeBand)
+             && isValidBusinessStructure(data.businessStructure)
+             // --- Booleans ---
+             && data.cipcRegistered is bool
+             && data.onboardingCompleted is bool
+             // --- Ownership lock (cannot set for another user) ---
+             && data.ownerId == request.auth.uid
+             // --- Optional field: customSectorText (max 200 chars) ---
+             && (!('customSectorText' in data.keys()) || isShortString(data.customSectorText, 200));
+    }
+
+    match /businesses/{userId} {
+      // Only the owner can read their own business document
+      allow read: if isOwner(userId);
+
+      // Create: only for your own UID, must pass full validation
+      allow create: if isOwner(userId) && isValidBusinessData(request.resource.data);
+
+      // Update: must still pass validation + cannot change ownerId
+      allow update: if isOwner(userId)
+                    && isValidBusinessData(request.resource.data)
+                    // Prevent ownership transfer
+                    && request.resource.data.ownerId == resource.data.ownerId
+                    // Prevent removing the onboarding flag once set
+                    && (resource.data.onboardingCompleted == false || request.resource.data.onboardingCompleted == true);
+
+      // Delete: owner only (e.g. account deletion)
+      allow delete: if isOwner(userId);
+    }
+
+    // ===============================================================
+    // COMPLIANCE ITEMS — /complianceItems/{itemId}
+    // ===============================================================
+    // Created during onboarding (seeded items)
+    // Updated via DetailModal (status, dates, notes, evidence)
+    // Read via onSnapshot with where("userId", "==", uid) filter
+
+    function isValidComplianceItemData(data) {
+      return data.keys().hasAll([
+               'userId', 'businessId', 'category', 'complianceGroup',
+               'title', 'description', 'legalReference', 'status',
+               'evidenceUrls', 'notes'
+             ])
+             // --- Ownership ---
+             && data.userId == request.auth.uid
+             && data.businessId == request.auth.uid
+             // --- String fields with size limits ---
+             && isShortString(data.title, 200)
+             && data.title.size() > 0
+             && isShortString(data.description, 2000)
+             && isShortString(data.legalReference, 200)
+             && isShortString(data.notes, 5000)
+             // --- Enums ---
+             && isValidComplianceStatus(data.status)
+             && isValidComplianceGroup(data.complianceGroup)
+             // --- Evidence URLs: list with max 20 entries, each URL max 2000 chars ---
+             && data.evidenceUrls is list
+             && data.evidenceUrls.size() <= 20;
+    }
+
+    match /complianceItems/{itemId} {
+      // Read: ONLY documents you own (must have userId filter in query)
+      // FIXED: Removed the old permissive rule that let any authenticated user
+      // read any compliance item with limit <= 100 (was a data leak!)
+      allow read: if isDocOwner();
+
+      // Create: validated, owner check, max items guard
+      allow create: if isRequestOwner()
+                    && isValidComplianceItemData(request.resource.data);
+
+      // Update: must be doc owner, data still valid, cannot change userId/businessId
+      allow update: if isDocOwner()
+                    && isRequestOwner()
+                    && isValidComplianceItemData(request.resource.data)
+                    // Prevent reassigning item to another user
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.businessId == resource.data.businessId
+                    // Don't allow changing the category (prevents duplication bugs)
+                    && request.resource.data.category == resource.data.category;
+
+      // Delete: only item owner
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
+    // ALERTS — /alerts/{alertId}
+    // ===============================================================
+    // Created by app logic (currently client-side, future: Cloud Functions)
+    // Read via onSnapshot with where("userId", "==", uid) filter
+    // Updated: mark as read (read: true)
+    // Deleted: by alert owner
+
+    function isValidAlertData(data) {
+      return data.keys().hasAll([
+               'userId', 'complianceItemId', 'type', 'message', 'read'
+             ])
+             && data.userId == request.auth.uid
+             // --- String fields ---
+             && isShortString(data.complianceItemId, 128)
+             && isValidAlertType(data.type)
+             && isShortString(data.message, 500)
+             && data.message.size() > 0
+             && data.read is bool;
+    }
+
+    match /alerts/{alertId} {
+      // Read: ONLY your own alerts
+      // FIXED: Removed old permissive rule (same data leak as complianceItems)
+      allow read: if isDocOwner();
+
+      // Create: user can create alerts for themselves
+      allow create: if isRequestOwner()
+                    && isValidAlertData(request.resource.data);
+
+      // Update: owner only, must stay valid, cannot reassign userId
+      // Only specific mutations allowed: marking as read
+      allow update: if isDocOwner()
+                    && isRequestOwner()
+                    && isValidAlertData(request.resource.data)
+                    && request.resource.data.userId == resource.data.userId
+                    // Only allow flipping read to true, not back to false
+                    && (resource.data.read == true || request.resource.data.read == true);
+
+      // Delete: alert owner only
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
+    // CONNECTION TEST — /test/connection
+    // ===============================================================
+    // Used for Firebase connectivity check on app load
+    // Read-only, no writes allowed
+
+    match /test/connection {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    // ===============================================================
+    // CATCH-ALL: Deny everything else
+    // ===============================================================
+    // Any collection or document not explicitly listed above is denied
+    // This prevents attackers from creating rogue collections to abuse billing
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

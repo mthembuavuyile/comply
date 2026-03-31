@@ -1,0 +1,53 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // ===============================================================
+    // EVIDENCE DOCUMENTS — /documents/{userId}/{filename}
+    // ===============================================================
+    // Users can only manage files within their own folder
+    // File size capped at 10MB to prevent billing abuse
+    // Only allowed content types (no executables)
+
+    match /documents/{userId}/{allPaths=**} {
+      // Read: only file owner
+      allow read: if isOwner(userId);
+
+      // Upload: owner only, max 10MB, safe content types only
+      allow create: if isOwner(userId)
+                    && request.resource.size < 10 * 1024 * 1024  // 10MB max
+                    && request.resource.contentType.matches(
+                         'image/.*|application/pdf|application/msword|application/vnd.openxmlformats-officedocument.*|text/plain'
+                       );
+
+      // Update (overwrite): same rules as create
+      allow update: if isOwner(userId)
+                    && request.resource.size < 10 * 1024 * 1024
+                    && request.resource.contentType.matches(
+                         'image/.*|application/pdf|application/msword|application/vnd.openxmlformats-officedocument.*|text/plain'
+                       );
+
+      // Delete: owner only
+      allow delete: if isOwner(userId);
+    }
+
+    // ===============================================================
+    // CATCH-ALL: Deny everything else
+    // ===============================================================
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
