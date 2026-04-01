@@ -124,26 +124,25 @@ service cloud.firestore {
     // Read via onSnapshot with where("userId", "==", uid) filter
 
     function isValidComplianceItemData(data) {
+      // 1. Only enforce core fields that MUST exist
       return data.keys().hasAll([
-               'userId', 'businessId', 'category', 'complianceGroup',
-               'title', 'description', 'legalReference', 'status',
-               'evidenceUrls', 'notes'
+               'userId', 'businessId', 'category', 'title', 'status'
              ])
              // --- Ownership ---
              && data.userId == request.auth.uid
              && data.businessId == request.auth.uid
-             // --- String fields with size limits ---
+             // --- Required Strings ---
              && isShortString(data.title, 200)
              && data.title.size() > 0
-             && isShortString(data.description, 2000)
-             && isShortString(data.legalReference, 200)
-             && isShortString(data.notes, 5000)
-             // --- Enums ---
+             // --- Required Enums ---
              && isValidComplianceStatus(data.status)
-             && isValidComplianceGroup(data.complianceGroup)
-             // --- Evidence URLs: list with max 20 entries, each URL max 2000 chars ---
-             && data.evidenceUrls is list
-             && data.evidenceUrls.size() <= 20;
+             
+             // 2. Make legacy/nullable fields OPTIONAL
+             && (!('complianceGroup' in data.keys()) || data.complianceGroup == null || isValidComplianceGroup(data.complianceGroup))
+             && (!('description' in data.keys())     || data.description == null     || isShortString(data.description, 2000))
+             && (!('legalReference' in data.keys())  || data.legalReference == null  || isShortString(data.legalReference, 200))
+             && (!('notes' in data.keys())           || data.notes == null           || isShortString(data.notes, 5000))
+             && (!('evidenceUrls' in data.keys())    || data.evidenceUrls == null    || (data.evidenceUrls is list && data.evidenceUrls.size() <= 20));
     }
 
     match /complianceItems/{itemId} {

@@ -17,7 +17,7 @@ async function testConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {
-    if(error instanceof Error && error.message.includes('the client is offline')) {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
       console.error("Please check your Firebase configuration. ");
     }
   }
@@ -27,7 +27,7 @@ testConnection();
 // --- Auth Context ---
 interface AuthContextType {
   user: User | null;
-  business: Business | null;
+  business: Business | null | undefined; // Allow undefined to represent 'fetching'
   loading: boolean;
   refreshBusiness: () => Promise<void>;
 }
@@ -36,7 +36,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [business, setBusiness] = useState<Business | null>(null);
+  const [business, setBusiness] = useState<Business | null | undefined>(undefined); // Start as undefined
   const [loading, setLoading] = useState(true);
 
   const fetchBusiness = async (uid: string, forceServer = false) => {
@@ -51,8 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error("Error fetching business:", error);
-      // Don't clear business on transient network errors if we already have data
-      // This prevents logged-in users from being kicked to onboarding on flaky connections
+      // Fallback to null ONLY if it was undefined to prevent infinite loading. 
+      // If we already have data, keep it to avoid kicking users on transient connection loss.
+      setBusiness((prev) => prev === undefined ? null : prev);
     }
   };
 
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
+        setBusiness(undefined); // Mark as fetching to prevent router race condition during login
         await fetchBusiness(user.uid);
       } else {
         setBusiness(null);
@@ -93,7 +95,8 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading, business } = useAuth();
   const location = useLocation();
 
-  if (loading) {
+  // Show loading spinner if auth is loading OR if user is logged in but business data is still fetching
+  if (loading || (user && business === undefined)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-500"></div>
