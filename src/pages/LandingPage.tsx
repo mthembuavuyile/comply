@@ -209,12 +209,6 @@ export default function LandingPage() {
         .feature-h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; }
         .feature-p { font-size: 15px; line-height: 1.6; color: var(--muted); }
 
-        /* STATS GRID */
-        .stats-wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; margin-top: 80px; }
-        .s-card { border-left: 1px solid var(--line); padding-left: 32px; }
-        .s-val { font-size: 48px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; }
-        .s-label { font-size: 14px; font-weight: 500; color: var(--muted); }
-
         /* SECURITY BAND */
         .security-band { background: var(--off); padding: 80px 32px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
         .sec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; max-width: 1280px; margin: 0 auto; }
@@ -243,11 +237,11 @@ export default function LandingPage() {
           .hero { padding: 140px 24px 80px; }
           .preview-container { order: -1; margin-bottom: 40px; }
           .preview-card { transform: none; }
-          .features-row, .stats-wrap, .sec-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+          .features-row, .sec-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
           .cta-wrap { flex-direction: column; align-items: flex-start; gap: 48px; padding: 64px 32px; }
         }
         @media (max-width: 640px) {
-          .features-row, .stats-wrap, .sec-grid, .f-grid { grid-template-columns: 1fr; }
+          .features-row, .sec-grid, .f-grid { grid-template-columns: 1fr; }
           .nav-links .nav-link { display: none; }
         }
       `}</style>
@@ -288,7 +282,7 @@ export default function LandingPage() {
           >
             <div className="hero-badge">
               <span className="hero-badge-dot" />
-              Serving 500+ South African Companies
+              Built for South African businesses
             </div>
             <h1 className="hero-h1 serif">
               Compliance is now <strong>simply managed.</strong>
@@ -314,69 +308,69 @@ export default function LandingPage() {
           >
             <div style={{ position: "absolute", top: -20, left: -20, right: 20, bottom: 20, background: "var(--sky-lt)", borderRadius: 32, filter: "blur(80px)", opacity: 0.4 }} />
             <div className="preview-card">
-               <div className="preview-header">
-                  <div className="preview-score">
-                     <div style={{ position: "relative", display: "flex", alignItems: "center", justifyCenter: "center" }}>
-                        <svg className="preview-svg-ring">
-                           <circle cx="60" cy="60" r="54" stroke="#f1f5f9" strokeWidth="8" fill="none" />
-                           <circle cx="60" cy="60" r="54" stroke="var(--sky)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="339.29" strokeDashoffset={339.29 - (339.29 * 94) / 100} />
-                        </svg>
-                        <div className="preview-ring-text" style={{ width: 120, height: 120 }}>
-                           <span className="preview-score-val">94%</span>
-                           <span className="preview-score-lbl">Health</span>
-                        </div>
-                     </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                     <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Overdue</div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>0</div>
-                     </div>
-                     <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Due Soon</div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: "var(--sky)" }}>2</div>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="preview-grid">
-                  <div className="preview-stat stat-green">
-                     <ShieldCheck size={14} style={{ marginBottom: 8 }} />
-                     <div style={{ fontSize: 12, fontWeight: 700 }}>Compliance Active</div>
-                     <div style={{ fontSize: 10, opacity: 0.8 }}>All SARS returns up to date</div>
-                  </div>
-                  <div className="preview-stat stat-amber">
-                     <Clock size={14} style={{ marginBottom: 8 }} />
-                     <div style={{ fontSize: 12, fontWeight: 700 }}>Due in 7 days</div>
-                     <div style={{ fontSize: 10, opacity: 0.8 }}>B-BBEE Audit Review</div>
-                  </div>
-               </div>
-
-               <div className="upcoming-row">
-                  {[
-                    { name: "VAT201 Submission", org: "SARS eFiling", date: "Mar 31", tag: "Urgent", cls: "tag-red", bg: "#fee2e2", txt: "#991b1b" },
-                    { name: "CIPC Annual Return", org: "CIPC Portal", date: "Apr 25", tag: "Tracked", cls: "tag-green", bg: "#dcfce7", txt: "#166534" },
-                  ].map((d) => (
-                    <div className="upcoming-item" key={d.name}>
-                       <div>
-                          <div className="upcoming-name">{d.name}</div>
-                          <div className="upcoming-org">{d.org}</div>
-                       </div>
-                       <span className="upcoming-date" style={{ background: d.bg, color: d.txt }}>{d.tag}</span>
+              <div className="preview-header">
+                <div className="preview-score">
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", justifyCenter: "center" }}>
+                    <svg className="preview-svg-ring">
+                      <circle cx="60" cy="60" r="54" stroke="#f1f5f9" strokeWidth="8" fill="none" />
+                      <circle cx="60" cy="60" r="54" stroke="var(--sky)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="339.29" strokeDashoffset={339.29 - (339.29 * 94) / 100} />
+                    </svg>
+                    <div className="preview-ring-text" style={{ width: 120, height: 120 }}>
+                      <span className="preview-score-val">94%</span>
+                      <span className="preview-score-lbl">Health</span>
                     </div>
-                  ))}
-               </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Overdue</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>0</div>
+                  </div>
+                  <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Due Soon</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--sky)" }}>2</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="preview-grid">
+                <div className="preview-stat stat-green">
+                  <ShieldCheck size={14} style={{ marginBottom: 8 }} />
+                  <div style={{ fontSize: 12, fontWeight: 700 }}>Compliance Active</div>
+                  <div style={{ fontSize: 10, opacity: 0.8 }}>All SARS returns up to date</div>
+                </div>
+                <div className="preview-stat stat-amber">
+                  <Clock size={14} style={{ marginBottom: 8 }} />
+                  <div style={{ fontSize: 12, fontWeight: 700 }}>Due in 7 days</div>
+                  <div style={{ fontSize: 10, opacity: 0.8 }}>B-BBEE Audit Review</div>
+                </div>
+              </div>
+
+              <div className="upcoming-row">
+                {[
+                  { name: "VAT201 Submission", org: "SARS eFiling", date: "Mar 31", tag: "Urgent", cls: "tag-red", bg: "#fee2e2", txt: "#991b1b" },
+                  { name: "CIPC Annual Return", org: "CIPC Portal", date: "Apr 25", tag: "Tracked", cls: "tag-green", bg: "#dcfce7", txt: "#166534" },
+                ].map((d) => (
+                  <div className="upcoming-item" key={d.name}>
+                    <div>
+                      <div className="upcoming-name">{d.name}</div>
+                      <div className="upcoming-org">{d.org}</div>
+                    </div>
+                    <span className="upcoming-date" style={{ background: d.bg, color: d.txt }}>{d.tag}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* FLOATING DECORATIONS */}
             <div style={{ position: "absolute", bottom: -20, right: 40, background: "#fff", border: "1px solid var(--line)", padding: "12px 20px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
-               <div style={{ background: "#dcfce7", padding: 6, borderRadius: 8 }}>
-                  <TrendingUp size={16} color="#16a34a" />
-               </div>
-               <div>
-                  <div style={{ fontSize: 14, fontWeight: 800 }}>R0.00</div>
-                  <div style={{ fontSize: 10, color: "var(--muted)", fontWeight: 600 }}>Total Penalties</div>
-               </div>
+              <div style={{ background: "#dcfce7", padding: 6, borderRadius: 8 }}>
+                <TrendingUp size={16} color="#16a34a" />
+              </div>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>R0.00</div>
+                <div style={{ fontSize: 10, color: "var(--muted)", fontWeight: 600 }}>Total Penalties</div>
+              </div>
             </div>
           </motion.div>
         </section>
@@ -386,10 +380,10 @@ export default function LandingPage() {
           <div className="trust-bar-inner">
             <span className="trust-label">Regulatory Alignment</span>
             <div className="trust-logos">
-               <span className="trust-logo"><Building2 size={16} /> SARS eFiling</span>
-               <span className="trust-logo"><FileText size={16} /> CIPC Portal</span>
-               <span className="trust-logo"><ShieldCheck size={16} /> B-BBEE Commission</span>
-               <span className="trust-logo"><Lock size={16} /> Companies Act 71</span>
+              <span className="trust-logo"><Building2 size={16} /> SARS eFiling</span>
+              <span className="trust-logo"><FileText size={16} /> CIPC Portal</span>
+              <span className="trust-logo"><ShieldCheck size={16} /> B-BBEE Commission</span>
+              <span className="trust-logo"><Lock size={16} /> Companies Act 71</span>
             </div>
           </div>
         </div>
@@ -406,136 +400,120 @@ export default function LandingPage() {
             </p>
 
             <div className="features-row">
-               {[
-                 {
-                   icon: BarChart3,
-                   title: "Real-time Health Score",
-                   desc: "An instant, high-level visualization of your business's compliance fitness across tax, labor, and company categories.",
-                   bg: "#f0f9ff", color: "var(--sky)"
-                 },
-                 {
-                   icon: Map,
-                   title: "Automated Roadmaps",
-                   desc: "A custom timeline of every CIPC, SARS, and B-BBEE submission required for your sector and company structure.",
-                   bg: "#fdf4ff", color: "#a21caf"
-                 },
-                 {
-                   icon: AlertTriangle,
-                   title: "Tiered Notifications",
-                   desc: "Smart alerts at 60, 30, and 7-day intervals. Escalate overdue items to directorship before they become penalties.",
-                   bg: "#fffbeb", color: "#d97706"
-                 }
-               ].map((f, i) => (
-                 <div className="feature-item" key={i}>
-                    <div className="f-icon" style={{ background: f.bg }}>
-                       <f.icon size={22} color={f.color} />
-                    </div>
-                    <h3 className="feature-h3">{f.title}</h3>
-                    <p className="feature-p">{f.desc}</p>
-                 </div>
-               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* STATS */}
-        <section className="section" style={{ background: "var(--off)" }}>
-          <div className="section-inner">
-             <div className="section-tag">Market Presence</div>
-             <h2 className="section-h2 serif">The numbers speak for <strong>South African accountability.</strong></h2>
-             <div className="stats-wrap">
-                {[
-                  { val: "94%", label: "Average client health score" },
-                  { val: "500+", label: "Active business profiles" },
-                  { val: "R0.00", label: "Penalties paid by users" },
-                  { val: "2min", label: "Time to first compliance report" }
-                ].map((s, i) => (
-                  <div className="s-card" key={i}>
-                    <div className="s-val serif">{s.val}</div>
-                    <div className="s-label">{s.label}</div>
+              {[
+                {
+                  icon: BarChart3,
+                  title: "Real-time Health Score",
+                  desc: "An instant, high-level visualization of your business's compliance fitness across tax, labor, and company categories.",
+                  bg: "#f0f9ff", color: "var(--sky)"
+                },
+                {
+                  icon: Map,
+                  title: "Automated Roadmaps",
+                  desc: "A custom timeline of every CIPC, SARS, and B-BBEE submission required for your sector and company structure.",
+                  bg: "#fdf4ff", color: "#a21caf"
+                },
+                {
+                  icon: AlertTriangle,
+                  title: "Tiered Notifications",
+                  desc: "Smart alerts at 60, 30, and 7-day intervals. Escalate overdue items to directorship before they become penalties.",
+                  bg: "#fffbeb", color: "#d97706"
+                }
+              ].map((f, i) => (
+                <div className="feature-item" key={i}>
+                  <div className="f-icon" style={{ background: f.bg }}>
+                    <f.icon size={22} color={f.color} />
                   </div>
-                ))}
-             </div>
+                  <h3 className="feature-h3">{f.title}</h3>
+                  <p className="feature-p">{f.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* SECURITY & GOVERNANCE */}
         <section className="security-band">
           <div className="sec-grid">
-             {[
-               { icon: Lock, title: "AES-256 Encryption", desc: "Your legal documents and company data are encrypted with bank-grade standards." },
-               { icon: ShieldCheck, title: "POPIA Compliant", desc: "Full alignment with the Protection of Personal Information Act protocols." },
-               { icon: Building2, title: "Local Data Residency", desc: "Data stored securely on South African soil, never leaving the jurisdiction." },
-               { icon: FileWarning, title: "Audit Ready", desc: "Every action and submission generates a immutable log for future auditing." },
-             ].map((s, i) => (
-               <div className="sec-item" key={i}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <s.icon size={16} color="var(--sky)" />
-                    <h4 className="sec-h4 uppercase">{s.title}</h4>
-                  </div>
-                  <p className="sec-p">{s.desc}</p>
-               </div>
-             ))}
+            {[
+              { icon: Lock, title: "AES-256 Encryption", desc: "Your legal documents and company data are encrypted with bank-grade standards." },
+              { icon: ShieldCheck, title: "POPIA Compliant", desc: "Full alignment with the Protection of Personal Information Act protocols." },
+              { icon: Building2, title: "Local Data Residency", desc: "Data stored securely on South African soil, never leaving the jurisdiction." },
+              { icon: FileWarning, title: "Audit Ready", desc: "Every action and submission generates an immutable log for future auditing." },
+            ].map((s, i) => (
+              <div className="sec-item" key={i}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <s.icon size={16} color="var(--sky)" />
+                  <h4 className="sec-h4 uppercase">{s.title}</h4>
+                </div>
+                <p className="sec-p">{s.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* FINAL CTA */}
         <section className="section">
-           <div className="section-inner">
-              <div className="cta-wrap">
-                 <div className="cta-content">
-                    <h2 className="cta-h2 serif">Protect your business <strong>starting today.</strong></h2>
-                    <p className="cta-p">Join the network of South African firms automating their accountability. Free for 14 days, no card required.</p>
-                 </div>
-                 <Link to="/auth" className="btn-hero" style={{ background: "#fff", color: "var(--ink)", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-                    Get Started Now <ArrowUpRight size={18} />
-                 </Link>
+          <div className="section-inner">
+            <div className="cta-wrap">
+              <div className="cta-content">
+                <h2 className="cta-h2 serif">Protect your business <strong>starting today.</strong></h2>
+                <p className="cta-p">Automate your South African compliance obligations. Free for 14 days, no card required.</p>
               </div>
-           </div>
+              <Link to="/auth" className="btn-hero" style={{ background: "#fff", color: "var(--ink)", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+                Get Started Now <ArrowUpRight size={18} />
+              </Link>
+            </div>
+          </div>
         </section>
 
         {/* FOOTER */}
         <footer className="footer">
           <div className="f-grid">
-             <div>
-                <Link to="/" className="logo" style={{ marginBottom: 20 }}>
-                  <div className="logo-mark">
-                    <ShieldCheck size={18} color="#fff" />
-                  </div>
-                  <span className="logo-text serif">Comply<span>OS</span></span>
-                </Link>
-                <p className="f-copy">
-                   Specialised compliance infrastructure for South African high-growth businesses. A Vylex Technology Group product.
-                </p>
-             </div>
-             <div>
-                <h5 className="f-title">Platform</h5>
-                <ul className="f-links">
-                   {["Features", "Tax Tracker", "Roadmap", "Pricing"].map(l => (
-                     <li key={l}><a href="#" className="f-link">{l}</a></li>
-                   ))}
-                </ul>
-             </div>
-             <div>
-                <h5 className="f-title">Company</h5>
-                <ul className="f-links">
-                   {["About", "Success Stories", "Blog", "Contact"].map(l => (
-                     <li key={l}><a href="#" className="f-link">{l}</a></li>
-                   ))}
-                </ul>
-             </div>
-             <div>
-                <h5 className="f-title">Legal</h5>
-                <ul className="f-links">
-                   {["Privacy Policy", "Terms of Service", "Security", "POPIA"].map(l => (
-                     <li key={l}><a href="#" className="f-link">{l}</a></li>
-                   ))}
-                </ul>
-             </div>
+            <div>
+              <Link to="/" className="logo" style={{ marginBottom: 20 }}>
+                <div className="logo-mark">
+                  <ShieldCheck size={18} color="#fff" />
+                </div>
+                <span className="logo-text serif">Comply<span>OS</span></span>
+              </Link>
+              <p className="f-copy">
+                Specialised compliance infrastructure for South African high-growth businesses. A Vylex Technology Group product.
+              </p>
+            </div>
+            <div>
+              <h5 className="f-title">Platform</h5>
+              <ul className="f-links">
+                {["Features", "Tax Tracker", "Roadmap", "Pricing"].map(l => (
+                  <li key={l}><a href="#" className="f-link">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h5 className="f-title">Company</h5>
+              <ul className="f-links">
+                {["About", "Success Stories", "Blog", "Contact"].map(l => (
+                  <li key={l}><a href="#" className="f-link">{l}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h5 className="f-title">Legal</h5>
+              <ul className="f-links">
+                {["Privacy Policy", "Terms of Service", "Security", "POPIA"].map(l => (
+                  <li key={l}><a href="#" className="f-link">{l}</a></li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div style={{ maxWidth: 1280, margin: "60px auto 0", pt: 32, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>© 2026 ComplyOS. Durban, South Africa.</span>
-             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>Powered by <strong>Vylex</strong></span>
+          <div style={{ maxWidth: 1280, margin: "60px auto 0", paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>© 2026 ComplyOS. Durban, South Africa.</span>
+            <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>
+              Powered by{" "}
+              <a href="https://vylex.co.za" target="_blank" rel="noopener noreferrer" style={{ color: "var(--sky)", fontWeight: 700, textDecoration: "none" }}>
+                Vylex
+              </a>
+            </span>
           </div>
         </footer>
 
