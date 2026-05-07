@@ -31,13 +31,13 @@ export default function LandingPage() {
       <style>{FONT}</style>
       <style>{`
         :root {
-          --ink:     #0f172a;
-          --ink-2:   #1e293b;
+          --ink:     #051B38;
+          --ink-2:   #0A2E5C;
           --muted:   #64748b;
           --line:    #e2e8f0;
-          --sky:     #0284c7;
-          --sky-lt:  #f0f9ff;
-          --sky-md:  #38bdf8;
+          --accent:  #FBA919;
+          --accent-lt: #FEF3C7;
+          --accent-md: #F59E0B;
           --white:   #ffffff;
           --off:     #f8fafc;
         }
@@ -61,16 +61,16 @@ export default function LandingPage() {
         }
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .logo-mark {
-          background: var(--sky); padding: 8px; border-radius: 10px;
+          background: var(--accent); padding: 8px; border-radius: 10px;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+          box-shadow: 0 4px 12px rgba(251, 169, 25, 0.2);
         }
         .logo-text { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; }
-        .logo-text span { color: var(--sky); }
+        .logo-text span { color: var(--accent); }
 
         .nav-links { display: flex; align-items: center; gap: 32px; }
         .nav-link { font-size: 14px; font-weight: 600; color: var(--muted); text-decoration: none; transition: color 0.15s; }
-        .nav-link:hover { color: var(--sky); }
+        .nav-link:hover { color: var(--accent); }
 
         .btn-primary {
           display: inline-flex; align-items: center; gap: 6px;
@@ -96,13 +96,13 @@ export default function LandingPage() {
         .hero-badge {
           display: inline-flex; align-items: center; gap: 8px;
           padding: 6px 14px;
-          background: var(--sky-lt); border: 1px solid #bae6fd; border-radius: 100px;
-          font-size: 11px; font-weight: 700; color: var(--sky);
+          background: var(--accent-lt); border: 1px solid var(--accent); border-radius: 100px;
+          font-size: 11px; font-weight: 700; color: var(--accent);
           margin-bottom: 28px; text-transform: uppercase; letter-spacing: 0.05em;
         }
         .hero-badge-dot {
           width: 6px; height: 6px; border-radius: 50%;
-          background: var(--sky); animation: pulse 2s infinite;
+          background: var(--accent); animation: pulse 2s infinite;
         }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
@@ -122,13 +122,13 @@ export default function LandingPage() {
         .hero-actions { display: flex; align-items: center; gap: 16px; }
         .btn-hero {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 16px 32px; background: var(--sky);
+          padding: 16px 32px; background: var(--accent);
           color: #fff; font-size: 16px; font-weight: 700;
           border-radius: 12px; text-decoration: none;
-          box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.4);
+          box-shadow: 0 10px 25px -5px rgba(251, 169, 25, 0.4);
           transition: all 0.2s ease;
         }
-        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(2, 132, 199, 0.5); background: #0369a1; }
+        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(251, 169, 25, 0.5); background: var(--accent-md); }
 
         .btn-outline {
           display: inline-flex; align-items: center; gap: 8px;
@@ -197,7 +197,7 @@ export default function LandingPage() {
 
         /* SECTIONS */
         .section { padding: 120px 32px; }
-        .section-tag { font-size: 12px; font-weight: 700; color: var(--sky); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; }
+        .section-tag { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; }
         .section-h2 { font-size: clamp(36px, 5vw, 52px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 24px; }
         .section-h2 strong { font-weight: 700; }
         .section-sub { font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 600px; }
@@ -230,7 +230,7 @@ export default function LandingPage() {
         .f-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--ink); letter-spacing: 0.1em; margin-bottom: 24px; }
         .f-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .f-link { font-size: 15px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-        .f-link:hover { color: var(--sky); }
+        .f-link:hover { color: var(--accent); }
 
         @media (max-width: 1024px) {
           .hero, .f-grid { grid-template-columns: 1fr; gap: 64px; }
@@ -306,14 +306,14 @@ export default function LandingPage() {
             transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="preview-container"
           >
-            <div style={{ position: "absolute", top: -20, left: -20, right: 20, bottom: 20, background: "var(--sky-lt)", borderRadius: 32, filter: "blur(80px)", opacity: 0.4 }} />
+            <div style={{ position: "absolute", top: -20, left: -20, right: 20, bottom: 20, background: "var(--accent-lt)", borderRadius: 32, filter: "blur(80px)", opacity: 0.4 }} />
             <div className="preview-card">
               <div className="preview-header">
                 <div className="preview-score">
                   <div style={{ position: "relative", display: "flex", alignItems: "center", justifyCenter: "center" }}>
                     <svg className="preview-svg-ring">
                       <circle cx="60" cy="60" r="54" stroke="#f1f5f9" strokeWidth="8" fill="none" />
-                      <circle cx="60" cy="60" r="54" stroke="var(--sky)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="339.29" strokeDashoffset={339.29 - (339.29 * 94) / 100} />
+                      <circle cx="60" cy="60" r="54" stroke="var(--accent)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="339.29" strokeDashoffset={339.29 - (339.29 * 94) / 100} />
                     </svg>
                     <div className="preview-ring-text" style={{ width: 120, height: 120 }}>
                       <span className="preview-score-val">94%</span>
@@ -328,7 +328,7 @@ export default function LandingPage() {
                   </div>
                   <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Due Soon</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--sky)" }}>2</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--accent)" }}>2</div>
                   </div>
                 </div>
               </div>
@@ -405,7 +405,7 @@ export default function LandingPage() {
                   icon: BarChart3,
                   title: "Real-time Health Score",
                   desc: "An instant, high-level visualization of your business's compliance fitness across tax, labor, and company categories.",
-                  bg: "#f0f9ff", color: "var(--sky)"
+                  bg: "var(--accent-lt)", color: "var(--accent-md)"
                 },
                 {
                   icon: Map,
@@ -443,7 +443,7 @@ export default function LandingPage() {
             ].map((s, i) => (
               <div className="sec-item" key={i}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <s.icon size={16} color="var(--sky)" />
+                  <s.icon size={16} color="var(--accent)" />
                   <h4 className="sec-h4 uppercase">{s.title}</h4>
                 </div>
                 <p className="sec-p">{s.desc}</p>
@@ -510,8 +510,8 @@ export default function LandingPage() {
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>© 2026 ComplyOS. Durban, South Africa.</span>
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>
               Powered by{" "}
-              <a href="https://vylex.co.za" target="_blank" rel="noopener noreferrer" style={{ color: "var(--sky)", fontWeight: 700, textDecoration: "none" }}>
-                Vylex
+              <a href="https://vylex.co.za" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", fontWeight: 700, textDecoration: "none" }}>
+                vylex.co.za
               </a>
             </span>
           </div>
