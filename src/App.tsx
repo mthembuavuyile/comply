@@ -11,6 +11,11 @@ import DocumentsPage from "./pages/DocumentsPage";
 import AlertsPage from "./pages/AlertsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SuppliersPage from "./pages/SuppliersPage";
+import SpendTrackerPage from "./pages/SpendTrackerPage";
+import ScorecardProjectsPage from "./pages/ScorecardProjectsPage";
+import ScorecardCalculatorPage from "./pages/ScorecardCalculatorPage";
+import AIAssistantPage from "./pages/AIAssistantPage";
 
 // --- Connection Test ---
 async function testConnection() {
@@ -152,6 +157,46 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <DocumentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/suppliers"
+            element={
+              <ProtectedRoute>
+                <SuppliersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/spend"
+            element={
+              <ProtectedRoute>
+                <SpendTrackerPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <ScorecardProjectsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/calculator"
+            element={
+              <ProtectedRoute>
+                <ScorecardCalculatorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ai"
+            element={
+              <ProtectedRoute>
+                <AIAssistantPage />
               </ProtectedRoute>
             }
           />

@@ -28,8 +28,16 @@ import {
   MapPin,
   Landmark,
   AlertTriangle,
+  Sparkles,
+  Key,
+  Check,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { GoogleGenAI } from "@google/genai";
 
 type SettingsTab = 'profile' | 'notifications' | 'integrations' | 'team' | 'billing';
 
@@ -79,7 +87,7 @@ export default function SettingsPage() {
           <div className="flex-1 min-w-0">
             {activeTab === 'profile' && <BusinessProfileTab />}
             {activeTab === 'notifications' && <ComingSoonTab title="Notifications" description="Configure email preferences and reminder lead times (7 days, 30 days before deadline)." />}
-            {activeTab === 'integrations' && <ComingSoonTab title="Connected Accounts" description="Connect your accounting software (Xero, Sage, QuickBooks) for automatic turnover tracking." />}
+            {activeTab === 'integrations' && <IntegrationsTab />}
             {activeTab === 'team' && <ComingSoonTab title="Team Members" description="Invite colleagues with role-based access — Owner, Admin, or View Only." />}
             {activeTab === 'billing' && <BillingTab />}
           </div>
@@ -373,6 +381,209 @@ function ComingSoonTab({ title, description }: { title: string; description: str
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Coming Soon</h3>
         <p className="text-gray-500 max-w-md mx-auto text-sm">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+// ======================================================================
+// GEMINI INTEGRATION TAB
+// ======================================================================
+function IntegrationsTab() {
+  const [apiKey, setApiKey] = useState("");
+  const [isSaved, setIsSaved] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Load key on mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem("comply_gemini_api_key") || "";
+    setApiKey(savedKey);
+  }, []);
+
+  const envKeyExists = !!(typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') || !!(import.meta.env.VITE_GEMINI_API_KEY);
+
+  const handleSave = () => {
+    localStorage.setItem("comply_gemini_api_key", apiKey.trim());
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 3000);
+  };
+
+  const handleClear = () => {
+    localStorage.removeItem("comply_gemini_api_key");
+    setApiKey("");
+    setTestResult(null);
+  };
+
+  const handleTestKey = async () => {
+    const keyToTest = apiKey.trim() || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : '') || import.meta.env.VITE_GEMINI_API_KEY || "";
+    if (!keyToTest) {
+      setTestResult({ success: false, message: "No API Key provided. Please enter a key or set it in your environment." });
+      return;
+    }
+
+    setTesting(true);
+    setTestResult(null);
+
+    try {
+      const aiInstance = new GoogleGenAI({ apiKey: keyToTest });
+      const response = await aiInstance.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: "Respond with exactly the word: 'Connected!'",
+      });
+
+      if (response.text && response.text.toLowerCase().includes("connect")) {
+        setTestResult({ success: true, message: "Gemini API Key validated successfully! The connection is active." });
+      } else {
+        setTestResult({ success: false, message: `Unexpected API response: ${response.text}` });
+      }
+    } catch (error: any) {
+      console.error("Gemini API Key test failed:", error);
+      setTestResult({ success: false, message: error.message || "Failed to connect to Gemini API. Check your key and network connection." });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Gemini AI Config Section */}
+      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-sky-500 animate-pulse" />
+              Gemini AI Integration
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">Configure your Gemini 2.5 Flash API Key to run B-BBEE Copilot consulting and document OCR analysis.</p>
+          </div>
+          <span className="self-start sm:self-center text-[10px] bg-sky-100 text-sky-800 border border-sky-200 font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">
+            Active
+          </span>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Status Message */}
+          <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-start space-x-3 text-xs text-gray-600">
+            <AlertTriangle className="h-5 w-5 text-sky-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-gray-900">How ComplyOS resolves your API key:</p>
+              <ul className="list-disc pl-4 mt-1 space-y-1">
+                <li>Browser Local Storage (saves below, specific to this browser/session).</li>
+                <li>Environment Variable `VITE_GEMINI_API_KEY` or `GEMINI_API_KEY` (configured in your `.env` file).</li>
+              </ul>
+              {envKeyExists && (
+                <div className="mt-2 text-emerald-600 font-bold flex items-center gap-1">
+                  <Check className="h-3.5 w-3.5" />
+                  Detected active API Key configured in your project's .env file!
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Input field */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700">Gemini API Key</label>
+            <div className="relative flex gap-2">
+              <div className="relative flex-1">
+                <Key className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type={showKey ? "text" : "password"}
+                  value={apiKey}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    setIsSaved(false);
+                  }}
+                  placeholder="AIzaSy..."
+                  className="block w-full pl-11 pr-10 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKey(!showKey)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+
+              {apiKey && (
+                <button
+                  onClick={handleClear}
+                  className="p-3 text-gray-400 hover:text-red-500 bg-gray-50 hover:bg-red-50 rounded-xl border border-gray-200 transition-colors"
+                  title="Clear saved API key"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Test results */}
+          {testResult && (
+            <div className={cn(
+              "p-4 rounded-2xl border text-xs font-semibold flex items-start gap-3 animate-in fade-in duration-200",
+              testResult.success 
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+                : "bg-red-50 border-red-200 text-red-800"
+            )}>
+              <div className="mt-0.5 flex-shrink-0">
+                {testResult.success ? <Check className="h-4 w-4 text-emerald-600" /> : <AlertCircle className="h-4 w-4 text-red-600" />}
+              </div>
+              <div>
+                <p className="font-bold">{testResult.success ? "Connection Success" : "Connection Failed"}</p>
+                <p className="mt-1 leading-relaxed">{testResult.message}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+          <button
+            onClick={handleTestKey}
+            disabled={testing}
+            className="flex items-center text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 px-5 py-2.5 text-sm font-bold rounded-xl transition-all disabled:opacity-50"
+          >
+            {testing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Testing...
+              </>
+            ) : (
+              "Test Key Connection"
+            )}
+          </button>
+          
+          <button
+            onClick={handleSave}
+            disabled={!apiKey.trim()}
+            className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-sky-100 hover:bg-sky-700 transition-all disabled:opacity-50"
+          >
+            {isSaved ? "Saved!" : "Save API Key"}
+          </button>
+        </div>
+      </div>
+
+      {/* Accounting integrations placeholder */}
+      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden opacity-85">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <Link2 className="h-5 w-5 text-gray-400" />
+            Financial & ERP Integrations
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">Connect your accounting systems to pull financial logs and calculate SD/ED turnover targets automatically.</p>
+        </div>
+        <div className="p-8 text-center bg-gray-50/20">
+          <div className="flex flex-wrap justify-center gap-4 mb-4 max-w-sm mx-auto opacity-40 grayscale">
+            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">XERO</div>
+            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">SAGE</div>
+            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">QUICKBOOKS</div>
+          </div>
+          <span className="text-[9px] bg-gray-100 text-gray-600 border border-gray-200 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+            Coming Soon
+          </span>
+        </div>
       </div>
     </div>
   );

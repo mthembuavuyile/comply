@@ -54,6 +54,12 @@ export interface Business {
   ownerId: string;
   // Legacy field — kept for backward compat, no longer written
   employeeCount?: number;
+  
+  // B-BBEE Fields
+  blackOwnershipPercent?: number;
+  blackWomenOwnershipPercent?: number;
+  annualPayroll?: number;
+  npat?: number; // Net Profit After Tax
 }
 
 export type ComplianceGroup =
@@ -121,3 +127,64 @@ export interface Alert {
   read: boolean;
   createdAt: Timestamp;
 }
+
+// --- B-BBEE Compliance Types ---
+
+export interface Supplier {
+  id: string;
+  userId: string;
+  name: string;
+  beeLevel: number; // 1 to 8, or 9 for non-compliant
+  blackOwnershipPercent: number;
+  blackWomenOwnershipPercent: number;
+  certificateUrl: string;
+  certificateExpiry: Timestamp | null;
+  category: 'EME' | 'QSE' | 'Generic';
+  annualSpend: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface SpendLog {
+  id: string;
+  userId: string;
+  category: 'skills_development' | 'enterprise_development' | 'supplier_development' | 'socio_economic_development';
+  description: string;
+  amount: number;
+  date: Timestamp;
+  evidenceUrl?: string;
+  createdAt: Timestamp;
+}
+
+export interface EvidenceDoc {
+  id: string;
+  userId: string;
+  name: string;
+  element: 'ownership' | 'skills' | 'procurement' | 'esd' | 'sed';
+  url: string;
+  tag: 'valid_for_audit' | 'missing_signature' | 'expired' | 'pending_verification';
+  aiReview: {
+    status: 'passed' | 'failed' | 'pending';
+    notes: string;
+  } | null;
+  uploadedAt: Timestamp;
+}
+
+export interface ScorecardProject {
+  id: string;
+  userId: string;
+  financialYear: string; // e.g. "2026"
+  status: 'data_collection' | 'supplier_verification' | 'evidence_upload' | 'internal_review' | 'auditor_ready' | 'certified';
+  points: {
+    ownership: number;
+    skills: number;
+    procurement: number;
+    esd: number;
+    sed: number;
+    total: number;
+  };
+  projectedLevel: number; // 1 to 8, or 9 for non-compliant
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+

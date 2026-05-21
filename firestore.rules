@@ -213,6 +213,46 @@ service cloud.firestore {
     }
 
     // ===============================================================
+    // B-BBEE: SUPPLIERS — /suppliers/{supplierId}
+    // ===============================================================
+    match /suppliers/{supplierId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
+    // B-BBEE: SPEND LOGS — /spendLogs/{logId}
+    // ===============================================================
+    match /spendLogs/{logId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
+    // B-BBEE: EVIDENCE VAULT — /evidenceVault/{docId}
+    // ===============================================================
+    match /evidenceVault/{docId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
+    // B-BBEE: SCORECARD PROJECTS — /scorecardProjects/{projectId}
+    // ===============================================================
+    match /scorecardProjects/{projectId} {
+      allow read: if isDocOwner();
+      allow create: if isRequestOwner();
+      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
+      allow delete: if isDocOwner();
+    }
+
+    // ===============================================================
     // CONNECTION TEST — /test/connection
     // ===============================================================
     // Used for Firebase connectivity check on app load

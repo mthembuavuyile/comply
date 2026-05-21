@@ -358,3 +358,38 @@ export const SECTOR_SPECIFIC_ITEMS: Partial<Record<Sector, DefaultComplianceItem
     },
   ],
 };
+
+// --- B-BBEE Scorecard Mappings ---
+
+export const BEE_LEVEL_THRESHOLDS = [
+  { level: 1, minPoints: 100 },
+  { level: 2, minPoints: 95 },
+  { level: 3, minPoints: 90 },
+  { level: 4, minPoints: 80 },
+  { level: 5, minPoints: 75 },
+  { level: 6, minPoints: 70 },
+  { level: 7, minPoints: 55 },
+  { level: 8, minPoints: 40 },
+  { level: 9, minPoints: 0 }, // Non-compliant
+];
+
+export const SUPPLIER_RECOGNITION_MAPPINGS: Record<number, { percent: number; label: string }> = {
+  1: { percent: 1.35, label: "135% Recognition" },
+  2: { percent: 1.25, label: "125% Recognition" },
+  3: { percent: 1.10, label: "110% Recognition" },
+  4: { percent: 1.00, label: "100% Recognition" },
+  5: { percent: 0.80, label: "80% Recognition" },
+  6: { percent: 0.60, label: "60% Recognition" },
+  7: { percent: 0.50, label: "50% Recognition" },
+  8: { percent: 0.10, label: "10% Recognition" },
+  9: { percent: 0.00, label: "0% (Non-compliant)" },
+};
+
+export const BEE_ELEMENTS = {
+  ownership: { maxPoints: 25, label: "Ownership" },
+  skills: { maxPoints: 20, label: "Skills Development" },
+  procurement: { maxPoints: 25, label: "Procurement Weighting" },
+  esd: { maxPoints: 40, label: "ESD (Enterprise & Supplier Development)" }, // Includes Procurement + SD + ED
+  sed: { maxPoints: 5, label: "SED (Socio-Economic Development)" },
+};
+

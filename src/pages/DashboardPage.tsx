@@ -1,580 +1,833 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
-import { ComplianceItem, ComplianceStatus, ComplianceGroup, Alert } from "../types";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { Supplier, SpendLog, ScorecardProject, Alert } from "../types";
 import Layout from "../components/Layout";
+import { calculateScorecard } from "../lib/scorecardEngine";
+import { getSectorLabel } from "../constants";
 import {
-  COMPLIANCE_GROUP_LABELS,
-  COMPLIANCE_GROUP_ORDER,
-  getSectorLabel,
-} from "../constants";
-import {
-  AlertCircle,
-  CheckCircle2,
+  Award,
+  ShieldCheck,
+  AlertTriangle,
   Clock,
   Calendar,
-  ArrowRight,
+  CheckCircle,
   Bell,
-  AlertTriangle,
-  ChevronRight,
-  ChevronDown,
-  ShieldCheck,
-  FileWarning,
+  Sparkles,
+  TrendingUp,
+  FileCheck,
+  Users,
   Info,
-  LucideIcon,
-  Settings2,
-  Upload,
-  BellRing,
+  Settings,
+  ChevronRight,
+  TrendingDown,
+  Building2,
+  Coins,
+  ArrowRight,
+  ArrowUpRight,
+  ListTodo,
+  CheckSquare,
+  Square,
+  HelpCircle,
+  FlameKindling,
+  UserCheck
 } from "lucide-react";
 import { cn, formatDate } from "../lib/utils";
-import { differenceInDays, isBefore, addDays } from "date-fns";
-import DetailModal from "../components/DetailModal";
 
-// --- Health Score State ---
-type HealthState = 'not_configured' | 'setting_up' | 'at_risk' | 'critical' | 'healthy';
-
-interface HealthConfig {
+// Checklist tasks structure
+interface ChecklistItem {
+  id: string;
   label: string;
-  color: string;
-  ringColor: string;
-  bgColor: string;
-  description: string;
+  category: string;
 }
 
-const HEALTH_STATES: Record<HealthState, HealthConfig> = {
-  not_configured: {
-    label: "Not Yet Configured",
-    color: "text-gray-400",
-    ringColor: "text-gray-300",
-    bgColor: "bg-gray-50",
-    description: "Complete setup to get your health score.",
-  },
-  setting_up: {
-    label: "Setting Up",
-    color: "text-sky-500",
-    ringColor: "text-sky-400",
-    bgColor: "bg-sky-50",
-    description: "Configure deadlines to activate monitoring.",
-  },
-  at_risk: {
-    label: "At Risk",
-    color: "text-amber-500",
-    ringColor: "text-amber-400",
-    bgColor: "bg-amber-50",
-    description: "Some items are expiring within 60 days.",
-  },
-  critical: {
-    label: "Critical",
-    color: "text-red-500",
-    ringColor: "text-red-500",
-    bgColor: "bg-red-50",
-    description: "You have overdue compliance items.",
-  },
-  healthy: {
-    label: "Healthy",
-    color: "text-green-500",
-    ringColor: "text-green-500",
-    bgColor: "bg-green-50",
-    description: "All items are compliant or tracked.",
-  },
-};
+const DEFAULT_CHECKLIST: ChecklistItem[] = [
+  { id: "supplier_certs", label: "Request updated B-BBEE certificates from all active suppliers", category: "procurement" },
+  { id: "voting_rights", label: "Verify company black ownership & voting rights documentation", category: "ownership" },
+  { id: "skills_audit", label: "Audit training spend invoices & payroll data against the 6% target", category: "skills" },
+  { id: "esd_agreements", label: "Gather Enterprise & Supplier Development (ESD) contribution agreements", category: "esd" },
+  { id: "sed_receipts", label: "Collect Socio-Economic Development (SED) donation receipts & NPO letters", category: "sed" },
+  { id: "auditor_pack", label: "Generate and export auditor-ready ZIP evidence pack", category: "general" },
+];
 
 export default function DashboardPage() {
   const { user, business } = useAuth();
-  const [items, setItems] = useState<ComplianceItem[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [spendLogs, setSpendLogs] = useState<SpendLog[]>([]);
+  const [projects, setProjects] = useState<ScorecardProject[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [selectedItem, setSelectedItem] = useState<ComplianceItem | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<ComplianceGroup>>(new Set());
+  const [checkedTasks, setCheckedTasks] = useState<Record<string, boolean>>({});
 
+  // Fetch Firestore collections
   useEffect(() => {
     if (!user) return;
 
-    const q = query(
-      collection(db, "complianceItems"),
-      where("userId", "==", user.uid),
-      orderBy("createdAt", "desc")
+    const unsubSuppliers = onSnapshot(
+      query(collection(db, "suppliers"), where("userId", "==", user.uid)),
+      (snapshot) => {
+        setSuppliers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Supplier[]);
+      },
+      (error) => handleFirestoreError(error, OperationType.GET, "suppliers")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newItems = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as ComplianceItem[];
-      setItems(newItems);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, "complianceItems");
-    });
-
-    const alertsQ = query(
-      collection(db, "alerts"),
-      where("userId", "==", user.uid),
-      where("read", "==", false)
+    const unsubSpend = onSnapshot(
+      query(collection(db, "spendLogs"), where("userId", "==", user.uid)),
+      (snapshot) => {
+        setSpendLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SpendLog[]);
+      },
+      (error) => handleFirestoreError(error, OperationType.GET, "spendLogs")
     );
 
-    const alertsUnsubscribe = onSnapshot(alertsQ, (snapshot) => {
-      const newAlerts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Alert[];
-      setAlerts(newAlerts);
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, "alerts");
-    });
+    const unsubProjects = onSnapshot(
+      query(collection(db, "scorecardProjects"), where("userId", "==", user.uid)),
+      (snapshot) => {
+        setProjects(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ScorecardProject[]);
+      },
+      (error) => handleFirestoreError(error, OperationType.GET, "scorecardProjects")
+    );
+
+    const unsubAlerts = onSnapshot(
+      query(collection(db, "alerts"), where("userId", "==", user.uid), where("read", "==", false)),
+      (snapshot) => {
+        setAlerts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Alert[]);
+      },
+      (error) => handleFirestoreError(error, OperationType.GET, "alerts")
+    );
 
     return () => {
-      unsubscribe();
-      alertsUnsubscribe();
+      unsubSuppliers();
+      unsubSpend();
+      unsubProjects();
+      unsubAlerts();
     };
   }, [user]);
 
-  // --- DEDUPLICATION: Only keep the most recently updated item per category ---
-  const deduplicatedItems = useMemo(() => {
-    const categoryMap = new Map<string, ComplianceItem>();
-    items.forEach((item) => {
-      const existing = categoryMap.get(item.category);
-      if (!existing) {
-        categoryMap.set(item.category, item);
-      } else {
-        // Keep the more recently updated one
-        const existingTime = existing.updatedAt?.toDate?.()?.getTime() || 0;
-        const currentTime = item.updatedAt?.toDate?.()?.getTime() || 0;
-        if (currentTime > existingTime) {
-          categoryMap.set(item.category, item);
+  // Load interactive checklist state from localStorage
+  useEffect(() => {
+    if (user) {
+      const stored = localStorage.getItem(`vylex_bbbee_checklist_${user.uid}`);
+      if (stored) {
+        try {
+          setCheckedTasks(JSON.parse(stored));
+        } catch (e) {
+          console.error("Error reading checklist storage:", e);
         }
-      }
-    });
-    return Array.from(categoryMap.values());
-  }, [items]);
-
-  // --- Auto-Status Logic (visual, based on dates) ---
-  const processedItems = useMemo(() => {
-    const today = new Date();
-    return deduplicatedItems.map(item => {
-      // Don't override compliant or pending_setup items
-      if (item.status === 'compliant') return item;
-      if (item.status === 'pending_setup') {
-        // If user has set a date but status is still pending_setup, keep it pending
-        if (!item.dueDate && !item.expiryDate) return item;
-      }
-
-      let newStatus: ComplianceStatus = item.status;
-      const expiryDate = item.expiryDate?.toDate?.();
-      const dueDate = item.dueDate?.toDate?.();
-
-      if (expiryDate) {
-        if (isBefore(expiryDate, today)) newStatus = 'overdue';
-        else if (isBefore(expiryDate, addDays(today, 30))) newStatus = 'expiring_soon';
-      }
-
-      if (dueDate) {
-        if (isBefore(dueDate, today)) newStatus = 'overdue';
-        else if (isBefore(dueDate, addDays(today, 30))) newStatus = 'expiring_soon';
-      }
-
-      return { ...item, status: newStatus };
-    }).sort((a, b) => {
-      const order: Record<ComplianceStatus, number> = {
-        overdue: 0,
-        action_required: 1,
-        expiring_soon: 2,
-        pending_setup: 3,
-        compliant: 4
-      };
-      return order[a.status] - order[b.status];
-    });
-  }, [deduplicatedItems]);
-
-  // --- Stats ---
-  const stats = useMemo(() => {
-    const s = { compliant: 0, due_soon: 0, overdue: 0, pending_setup: 0 };
-    const today = new Date();
-
-    processedItems.forEach((item) => {
-      if (item.status === 'compliant') {
-        s.compliant++;
-      } else if (item.status === 'overdue') {
-        s.overdue++;
-      } else if (item.status === 'pending_setup') {
-        s.pending_setup++;
-      } else if (item.status === 'expiring_soon') {
-        s.due_soon++;
       } else {
-        // action_required — check if due within 30 days
-        const targetDate = item.expiryDate?.toDate?.() || item.dueDate?.toDate?.();
-        if (targetDate && differenceInDays(targetDate, today) <= 30) {
-          s.due_soon++;
-        } else {
-          s.pending_setup++; // unconfigured action_required → pending_setup visually
-        }
+        setCheckedTasks({});
       }
-    });
-    return s;
-  }, [processedItems]);
+    }
+  }, [user]);
 
-  // --- Health State ---
-  const healthState: HealthState = useMemo(() => {
-    if (processedItems.length === 0) return 'not_configured';
-    if (stats.overdue > 0) return 'critical';
-
-    const today = new Date();
-    const hasAtRisk = processedItems.some((item) => {
-      const targetDate = item.expiryDate?.toDate?.() || item.dueDate?.toDate?.();
-      return targetDate && differenceInDays(targetDate, today) <= 60 && item.status !== 'compliant';
-    });
-    if (hasAtRisk) return 'at_risk';
-
-    const allPending = processedItems.every(item => item.status === 'pending_setup');
-    if (allPending) return 'not_configured';
-
-    const allCompliant = processedItems.every(item => item.status === 'compliant');
-    if (allCompliant) return 'healthy';
-
-    return 'setting_up';
-  }, [processedItems, stats]);
-
-  const healthConfig = HEALTH_STATES[healthState];
-
-  // --- Score ---
-  const score = useMemo(() => {
-    if (processedItems.length === 0) return 0;
-    let weight = 0;
-    processedItems.forEach((item) => {
-      if (item.status === 'compliant') weight += 1.0;
-      else if (item.status === 'expiring_soon') weight += 0.5;
-      else if (item.status === 'pending_setup') weight += 0; // Don't penalize, just not counted
-    });
-    // Exclude pending_setup from denominator for meaningful score
-    const configuredCount = processedItems.filter(i => i.status !== 'pending_setup').length;
-    if (configuredCount === 0) return 0;
-    return Math.round((weight / configuredCount) * 100);
-  }, [processedItems]);
-
-  // --- Grouped Items ---
-  const groupedItems = useMemo(() => {
-    const groups = new Map<ComplianceGroup, ComplianceItem[]>();
-    COMPLIANCE_GROUP_ORDER.forEach(g => groups.set(g, []));
-
-    processedItems.forEach((item) => {
-      const group = item.complianceGroup || 'licensing'; // Fallback for legacy items without group
-      const list = groups.get(group) || [];
-      list.push(item);
-      groups.set(group, list);
-    });
-
-    return COMPLIANCE_GROUP_ORDER.map(g => ({
-      group: g,
-      label: COMPLIANCE_GROUP_LABELS[g],
-      items: groups.get(g) || [],
-    })).filter(g => g.items.length > 0);
-  }, [processedItems]);
-
-  const toggleGroup = (group: ComplianceGroup) => {
-    setCollapsedGroups(prev => {
-      const next = new Set(prev);
-      if (next.has(group)) next.delete(group);
-      else next.add(group);
-      return next;
-    });
+  // Toggle checklist tasks
+  const handleToggleTask = (taskId: string) => {
+    if (!user) return;
+    const nextState = { ...checkedTasks, [taskId]: !checkedTasks[taskId] };
+    setCheckedTasks(nextState);
+    localStorage.setItem(`vylex_bbbee_checklist_${user.uid}`, JSON.stringify(nextState));
   };
 
-  const urgentCount = stats.overdue;
-  const sectorLabel = business ? getSectorLabel(business.sector) : '';
+  // Calculate live scorecard
+  const liveScorecard = useMemo(() => {
+    return calculateScorecard(business, suppliers, spendLogs);
+  }, [business, suppliers, spendLogs]);
+
+  // Active Project Timeline (latest year)
+  const activeProject = useMemo(() => {
+    if (projects.length === 0) return null;
+    // Sort descending by financialYear
+    return [...projects].sort((a, b) => b.financialYear.localeCompare(a.financialYear))[0];
+  }, [projects]);
+
+  // Recognition rate label matching level
+  const recognitionRatePercent = useMemo(() => {
+    const mappings: Record<number, number> = {
+      1: 135,
+      2: 125,
+      3: 110,
+      4: 100,
+      5: 80,
+      6: 60,
+      7: 50,
+      8: 10,
+      9: 0,
+    };
+    return mappings[liveScorecard.projectedLevel] ?? 0;
+  }, [liveScorecard.projectedLevel]);
+
+  // Dynamic Risk Alerts computation
+  const dynamicRisks = useMemo(() => {
+    const list: {
+      id: string;
+      severity: "critical" | "warning" | "info";
+      title: string;
+      message: string;
+      actionUrl: string;
+      actionLabel: string;
+    }[] = [];
+
+    const today = new Date();
+
+    // 1. Missing Financial Config
+    if (!business?.annualPayroll || !business?.npat) {
+      list.push({
+        id: "missing_finance_config",
+        severity: "critical",
+        title: "Financial Targets Not Configured",
+        message: "Configure your annual payroll and Net Profit After Tax (NPAT) to accurately model B-BBEE spending targets.",
+        actionUrl: "/spend",
+        actionLabel: "Configure Now",
+      });
+    }
+
+    // 2. Expired Supplier Certificates
+    const expiredSuppliers = suppliers.filter(s => {
+      if (!s.certificateExpiry) return false;
+      const expiry = s.certificateExpiry.toDate();
+      return expiry < today;
+    });
+
+    if (expiredSuppliers.length > 0) {
+      list.push({
+        id: "expired_certs",
+        severity: "critical",
+        title: `${expiredSuppliers.length} Expired Supplier Certificate${expiredSuppliers.length === 1 ? "" : "s"}`,
+        message: `${expiredSuppliers.length === 1 ? "A supplier certificate has" : `${expiredSuppliers.length} supplier certificates have`} expired. This invalidates their recognition weighting until updated.`,
+        actionUrl: "/suppliers",
+        actionLabel: "Update Suppliers",
+      });
+    }
+
+    // 3. Expiring Soon Supplier Certificates (within 30 days)
+    const expiringSoonSuppliers = suppliers.filter(s => {
+      if (!s.certificateExpiry) return false;
+      const expiry = s.certificateExpiry.toDate();
+      const diffMs = expiry.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      return diffDays > 0 && diffDays <= 30;
+    });
+
+    if (expiringSoonSuppliers.length > 0) {
+      list.push({
+        id: "expiring_soon_certs",
+        severity: "warning",
+        title: `${expiringSoonSuppliers.length} Certificate${expiringSoonSuppliers.length === 1 ? "" : "s"} Expiring Soon`,
+        message: `${expiringSoonSuppliers.length === 1 ? "A supplier certificate expires" : `${expiringSoonSuppliers.length} certificates expire`} within 30 days. Request updated verification packs immediately.`,
+        actionUrl: "/suppliers",
+        actionLabel: "View Certificates",
+      });
+    }
+
+    // 4. Skills Spend Gap
+    if (liveScorecard.targets.skillsGap > 0) {
+      list.push({
+        id: "skills_spend_gap",
+        severity: "warning",
+        title: "Skills Development Target Gap",
+        message: `You are R ${liveScorecard.targets.skillsGap.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} short of the 6% payroll investment target (R ${liveScorecard.targets.skillsTarget.toLocaleString("en-ZA", { maximumFractionDigits: 0 })}).`,
+        actionUrl: "/spend",
+        actionLabel: "Log Training Spend",
+      });
+    }
+
+    // 5. ED Spend Gap
+    if (liveScorecard.targets.edGap > 0) {
+      list.push({
+        id: "ed_spend_gap",
+        severity: "info",
+        title: "Enterprise Development (ED) Gap",
+        message: `Invest R ${liveScorecard.targets.edGap.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} more in qualified black EMEs or QSEs to secure full ED points.`,
+        actionUrl: "/spend",
+        actionLabel: "Log ED Support",
+      });
+    }
+
+    // 6. SD Spend Gap
+    if (liveScorecard.targets.sdGap > 0) {
+      list.push({
+        id: "sd_spend_gap",
+        severity: "info",
+        title: "Supplier Development (SD) Gap",
+        message: `Invest R ${liveScorecard.targets.sdGap.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} more in black-owned suppliers to meet your 2% NPAT SD target.`,
+        actionUrl: "/spend",
+        actionLabel: "Log SD Support",
+      });
+    }
+
+    // 7. SED Spend Gap
+    if (liveScorecard.targets.sedGap > 0) {
+      list.push({
+        id: "sed_spend_gap",
+        severity: "info",
+        title: "Socio-Economic Development (SED) Gap",
+        message: `You are R ${liveScorecard.targets.sedGap.toLocaleString("en-ZA", { maximumFractionDigits: 0 })} away from your 1% NPAT SED charitable contribution target.`,
+        actionUrl: "/spend",
+        actionLabel: "Log Donations",
+      });
+    }
+
+    // 8. Low Ownership Warning
+    if (business && (business.blackOwnershipPercent || 0) < 25.1) {
+      list.push({
+        id: "low_black_ownership",
+        severity: "warning",
+        title: "Sub-Optimal Ownership points",
+        message: `Black economic interest is currently ${(business.blackOwnershipPercent || 0)}%. A minimum of 25.1% is required to maximize points and avoid sub-minimum penalties.`,
+        actionUrl: "/calculator",
+        actionLabel: "Simulate Ownership",
+      });
+    }
+
+    return list;
+  }, [business, suppliers, liveScorecard]);
+
+  // Scorecard categories formatted nicely for horizontal progression bars
+  const scorecardCategories = useMemo(() => {
+    const { points } = liveScorecard;
+    return [
+      {
+        name: "Ownership",
+        desc: "Equity ownership, voting rights & economic interest of black shareholders",
+        actual: points.ownership,
+        max: 25.00,
+        colorClass: "bg-amber-500",
+        badge: points.ownership >= 20 ? "Optimal" : points.ownership >= 10 ? "Moderate" : "Low",
+        badgeColor: points.ownership >= 20 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : points.ownership >= 10 ? "bg-sky-50 text-sky-700 border-sky-100" : "bg-red-50 text-red-700 border-red-100",
+      },
+      {
+        name: "Skills Development",
+        desc: "Training spend on black employees, bursaries, and work learnerships",
+        actual: points.skills,
+        max: 20.00,
+        colorClass: "bg-indigo-500",
+        badge: points.skills >= 16 ? "Target Reached" : points.skills >= 8 ? "Partial" : "Critical Gap",
+        badgeColor: points.skills >= 16 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : points.skills >= 8 ? "bg-sky-50 text-sky-700 border-sky-100" : "bg-red-50 text-red-700 border-red-100",
+      },
+      {
+        name: "Procurement Weighting",
+        desc: "B-BBEE recognition spend percentage across all active suppliers",
+        actual: points.procurement,
+        max: 25.00,
+        colorClass: "bg-rose-500",
+        badge: points.procurement >= 20 ? "On Target" : points.procurement >= 10 ? "Satisfactory" : "Low Recognition",
+        badgeColor: points.procurement >= 20 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : points.procurement >= 10 ? "bg-sky-50 text-sky-700 border-sky-100" : "bg-red-50 text-red-700 border-red-100",
+      },
+      {
+        name: "Enterprise & Supplier Dev (ED & SD)",
+        desc: "Contributions supporting suppliers & independent black businesses",
+        actual: points.esdSubtotal,
+        max: 15.00,
+        colorClass: "bg-emerald-500",
+        badge: points.esdSubtotal >= 12 ? "Optimized" : points.esdSubtotal >= 6 ? "Progressing" : "Under-invested",
+        badgeColor: points.esdSubtotal >= 12 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : points.esdSubtotal >= 6 ? "bg-sky-50 text-sky-700 border-sky-100" : "bg-red-50 text-red-700 border-red-100",
+      },
+      {
+        name: "Socio-Economic Development (SED)",
+        desc: "Grants & donations aligned with local community empowerment",
+        actual: points.sed,
+        max: 5.00,
+        colorClass: "bg-sky-500",
+        badge: points.sed >= 4.5 ? "Full Points" : points.sed >= 2.5 ? "Partial" : "Action Required",
+        badgeColor: points.sed >= 4.5 ? "bg-emerald-50 text-emerald-700 border-emerald-100" : points.sed >= 2.5 ? "bg-sky-50 text-sky-700 border-sky-100" : "bg-red-50 text-red-700 border-red-100",
+      },
+    ];
+  }, [liveScorecard]);
+
+  // Summary counts for dashboard metrics
+  const checklistTotalCount = DEFAULT_CHECKLIST.length;
+  const checklistCheckedCount = Object.values(checkedTasks).filter(Boolean).length;
+  const checklistPercentage = Math.round((checklistCheckedCount / checklistTotalCount) * 100);
+
+  const sectorLabel = business ? getSectorLabel(business.sector) : "";
 
   return (
     <Layout>
       <div className="space-y-8 max-w-7xl mx-auto">
-        {/* Header Section */}
+        {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                {business?.businessName}
+                {business?.businessName || "Vylex Comply"}
               </h1>
               {sectorLabel && (
-                <span className="px-3 py-1 bg-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-sky-200">
+                <span className="px-3 py-1 bg-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-sky-200 shadow-sm shadow-sky-50/50">
                   {sectorLabel}
                 </span>
               )}
             </div>
             <p className="text-gray-500 font-medium">
-              {new Intl.DateTimeFormat("en-ZA", { dateStyle: "full" }).format(new Date())}
+              B-BBEE Compliance Health Monitor · {new Intl.DateTimeFormat("en-ZA", { dateStyle: "full" }).format(new Date())}
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
-                <Bell className="h-6 w-6 text-gray-600" />
-                {alerts.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white ring-2 ring-red-100">
-                    {alerts.length}
-                  </span>
-                )}
-              </div>
-            </div>
+          <div className="flex items-center space-x-3">
+            <a
+              href="/ai"
+              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-sky-100"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Ask AI BEE Copilot</span>
+            </a>
           </div>
         </div>
 
-        {/* Health Score & Stats */}
+        {/* Level Radial Wheel & Score Summary cockpit */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className={cn("lg:col-span-1 p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center justify-center text-center", healthConfig.bgColor)}>
-            <div className="relative w-44 h-44 mb-5">
+          {/* Circular Wheel Gauge Card */}
+          <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <a href="/calculator" className="p-1.5 text-gray-400 hover:text-sky-600 transition-colors">
+                <ArrowUpRight className="h-5 w-5" />
+              </a>
+            </div>
+            <div className="relative w-48 h-48 mb-5">
               <svg className="w-full h-full transform -rotate-90">
-                <circle cx="88" cy="88" r="80" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-200/50" />
                 <circle
-                  cx="88"
-                  cy="88"
-                  r="80"
+                  cx="96"
+                  cy="96"
+                  r="84"
                   stroke="currentColor"
+                  strokeWidth="10"
+                  fill="transparent"
+                  className="text-gray-100"
+                />
+                <circle
+                  cx="96"
+                  cy="96"
+                  r="84"
+                  stroke="url(#beeGrad)"
                   strokeWidth="12"
                   fill="transparent"
                   strokeLinecap="round"
-                  strokeDasharray={502.65}
-                  strokeDashoffset={502.65 - (502.65 * score) / 100}
-                  className={cn("transition-all duration-1000 ease-out", healthConfig.ringColor)}
+                  strokeDasharray={527.78}
+                  strokeDashoffset={527.78 - (527.78 * liveScorecard.points.total) / 100}
+                  className="transition-all duration-1000 ease-out"
                 />
+                <defs>
+                  <linearGradient id="beeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#0ea5e9" />
+                    <stop offset="100%" stopColor="#4f46e5" />
+                  </linearGradient>
+                </defs>
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={cn("text-5xl font-black", healthState === 'not_configured' ? "text-gray-300" : "text-gray-900")}>
-                  {healthState === 'not_configured' ? '—' : `${score}%`}
+                <span className="text-5xl font-black text-gray-900 tracking-tighter">
+                  {liveScorecard.points.total.toFixed(1)}
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1">Health Score</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1">
+                  of 100 Points
+                </span>
               </div>
             </div>
-            <div className="space-y-1">
-              <h3 className={cn("text-lg font-bold", healthConfig.color)}>{healthConfig.label}</h3>
-              <p className="text-sm text-gray-500">{healthConfig.description}</p>
+            <div className="space-y-1.5">
+              <div className={cn(
+                "px-4 py-1.5 rounded-full text-sm font-black uppercase tracking-wider inline-block border",
+                liveScorecard.projectedLevel === 9
+                  ? "bg-rose-50 text-rose-700 border-rose-100"
+                  : "bg-emerald-50 text-emerald-700 border-emerald-100"
+              )}>
+                {liveScorecard.projectedLevel === 9 ? "Non-Compliant" : `Level ${liveScorecard.projectedLevel} Contributor`}
+              </div>
+              <p className="text-xs text-gray-400 font-bold mt-1">
+                Client Recognition Rate: <span className="text-gray-700 font-black">{recognitionRatePercent}%</span>
+              </p>
             </div>
           </div>
 
+          {/* Quick Metrics Cockpit cards */}
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <StatCard label="Compliant" value={stats.compliant} icon={ShieldCheck} color="green" description="Items fully up to date" />
-            <StatCard label="Due Soon" value={stats.due_soon} icon={Clock} color="amber" description="Expiring within 30 days" />
-            <StatCard label="Overdue" value={stats.overdue} icon={FileWarning} color="red" description="Past legal deadlines" />
-            <StatCard label="Pending Setup" value={stats.pending_setup} icon={Settings2} color="blue" description="Configure deadlines to activate" />
-          </div>
-        </div>
-
-        {/* Urgent Banner */}
-        {urgentCount > 0 && (
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-5 flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-500">
-            <div className="flex items-center space-x-4">
-              <div className="bg-red-500 p-2 rounded-xl shadow-lg shadow-red-200">
-                <AlertTriangle className="h-6 w-6 text-white" />
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-100 text-amber-500">
+                  <Coins className="h-6 w-6" />
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Ownership Weight</p>
+                  <p className="text-xl font-black text-gray-900 mt-0.5">
+                    {business?.blackOwnershipPercent || 0}%
+                  </p>
+                </div>
               </div>
               <div>
-                <p className="font-bold text-red-900">
-                  {urgentCount} overdue {urgentCount === 1 ? 'item' : 'items'} require{urgentCount === 1 ? 's' : ''} immediate attention
+                <h4 className="font-extrabold text-gray-900">Black Equity Interest</h4>
+                <p className="text-xs text-gray-400 font-medium mt-1">
+                  Women ownership matches: <span className="font-bold text-gray-700">{business?.blackWomenOwnershipPercent || 0}%</span>
                 </p>
-                <p className="text-sm text-red-700">
-                  Non-compliance may result in significant fines or legal action from regulators.
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-500">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Spend</p>
+                  <p className="text-xl font-black text-gray-900 mt-0.5">
+                    R {spendLogs.reduce((sum, s) => sum + s.amount, 0).toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-extrabold text-gray-900">Skills, ED, SD & SED Spend</h4>
+                <p className="text-xs text-gray-400 font-medium mt-1">
+                  Across <span className="font-bold text-gray-700">{spendLogs.length} logged ledger entries</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-rose-50 rounded-2xl border border-rose-100 text-rose-500">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Suppliers Registered</p>
+                  <p className="text-xl font-black text-gray-900 mt-0.5">
+                    {suppliers.length}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-extrabold text-gray-900">Procurement Base CRM</h4>
+                <p className="text-xs text-gray-400 font-medium mt-1">
+                  Weighted recognition: <span className="font-bold text-gray-700">
+                    R {suppliers.reduce((sum, s) => {
+                      const rec = s.beeLevel === 1 ? 1.35 : s.beeLevel === 2 ? 1.25 : s.beeLevel === 3 ? 1.10 : s.beeLevel === 4 ? 1.00 : s.beeLevel === 5 ? 0.80 : s.beeLevel === 6 ? 0.60 : s.beeLevel === 7 ? 0.50 : s.beeLevel === 8 ? 0.10 : 0;
+                      return sum + s.annualSpend * rec;
+                    }, 0).toLocaleString("en-ZA", { maximumFractionDigits: 0 })}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-500">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Audit Prep Tasks</p>
+                  <p className="text-xl font-black text-gray-900 mt-0.5">
+                    {checklistPercentage}%
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-extrabold text-gray-900">Checklist Completion</h4>
+                <p className="text-xs text-gray-400 font-medium mt-1">
+                  {checklistCheckedCount} of {checklistTotalCount} actions finalized
                 </p>
               </div>
             </div>
           </div>
-        )}
-
-        {/* Turnover Tax Tracker */}
-        <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Turnover Tax Tracker</h2>
-              <p className="text-sm text-gray-500 mt-1">Monitor your revenue against the new R2.3M threshold (Effective April 2026)</p>
-            </div>
-            <button className="px-4 py-2 bg-sky-50 text-sky-600 text-sm font-bold rounded-xl hover:bg-sky-100 transition-colors border border-sky-100">
-              Connect Accounting Software
-            </button>
-          </div>
-          <div className="relative pt-4">
-            <div className="flex mb-2 items-center justify-between">
-              <span className="text-xs font-bold inline-block py-1 px-2 uppercase rounded-full text-sky-600 bg-sky-100">Current Turnover</span>
-              <span className="text-xs font-bold inline-block text-gray-600">R2,300,000 Threshold</span>
-            </div>
-            <div className="overflow-hidden h-4 mb-4 text-xs flex rounded-full bg-gray-100">
-              <div style={{ width: "45%" }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-sky-500 transition-all duration-1000 rounded-full"></div>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-gray-900">
-              <span>R 1,035,000</span>
-              <span className="text-gray-400">R 1,265,000 remaining</span>
-            </div>
-          </div>
         </div>
 
-        {/* Compliance Roadmap — Grouped */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Compliance Roadmap</h2>
-            <div className="flex items-center space-x-2 text-sm font-semibold text-gray-400">
-              <Info className="h-4 w-4" />
-              <span>{processedItems.length} items · Grouped by category</span>
+        {/* 5 Elements Scorecard Progress bars */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-lg font-black text-gray-900 tracking-tight">Scorecard Element Progress</h3>
+              <p className="text-xs text-gray-400 font-medium mt-1">Points breakdown calculated directly via current recorded evidence and targets.</p>
             </div>
+            <a
+              href="/calculator"
+              className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 bg-sky-50 px-3.5 py-2 rounded-xl transition-all"
+            >
+              <span>Scenario Calculator</span>
+              <ChevronRight className="h-4.5 w-4.5" />
+            </a>
           </div>
 
-          {groupedItems.map(({ group, label, items: groupItems }) => {
-            const isCollapsed = collapsedGroups.has(group);
-            const groupCompliant = groupItems.filter(i => i.status === 'compliant').length;
-            const groupOverdue = groupItems.filter(i => i.status === 'overdue').length;
-
-            return (
-              <div key={group} className="bg-white rounded-3xl shadow-xl shadow-gray-200/30 border border-gray-100 overflow-hidden">
-                {/* Group Header */}
-                <button
-                  onClick={() => toggleGroup(group)}
-                  className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className={cn(
-                      "w-2 h-8 rounded-full",
-                      groupOverdue > 0 ? "bg-red-500" : groupCompliant === groupItems.length ? "bg-green-500" : "bg-sky-500"
-                    )} />
-                    <div className="text-left">
-                      <h3 className="text-lg font-bold text-gray-900">{label}</h3>
-                      <p className="text-xs text-gray-400 font-medium">
-                        {groupCompliant}/{groupItems.length} compliant
-                        {groupOverdue > 0 && <span className="text-red-500 ml-2">· {groupOverdue} overdue</span>}
-                      </p>
+          <div className="space-y-6">
+            {scorecardCategories.map((cat) => {
+              const pct = Math.min(100, Math.round((cat.actual / cat.max) * 100));
+              return (
+                <div key={cat.name} className="space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-extrabold text-sm text-gray-900">{cat.name}</h4>
+                        <span className={cn(
+                          "px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border",
+                          cat.badgeColor
+                        )}>
+                          {cat.badge}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 font-medium leading-tight mt-0.5">{cat.desc}</p>
+                    </div>
+                    <div className="flex items-baseline space-x-1 sm:text-right">
+                      <span className="text-sm font-black text-gray-800">{cat.actual.toFixed(2)}</span>
+                      <span className="text-xs font-bold text-gray-400">/ {cat.max.toFixed(2)} pts</span>
                     </div>
                   </div>
-                  {isCollapsed ? (
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-
-                {/* Group Items */}
-                {!isCollapsed && (
-                  <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {groupItems.map((item) => (
-                      <ComplianceCard
-                        key={item.id}
-                        item={item}
-                        onClick={() => {
-                          setSelectedItem(item);
-                          setIsModalOpen(true);
-                        }}
+                  <div className="relative">
+                    <div className="overflow-hidden h-2.5 bg-gray-50 rounded-full border border-gray-100">
+                      <div
+                        style={{ width: `${pct}%` }}
+                        className={cn("h-full rounded-full transition-all duration-1000", cat.colorClass)}
                       />
-                    ))}
+                    </div>
                   </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Risks Alert Board & Audit Checklist */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Dynamic B-BBEE Risks Card */}
+          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center space-x-2 text-rose-600 mb-4">
+                <AlertTriangle className="h-5 w-5" />
+                <h3 className="text-lg font-black text-gray-900 tracking-tight">Active Scorecard Risks</h3>
+              </div>
+              <p className="text-xs text-gray-400 font-medium mb-6">Real-time alerts highlighting actions required to preserve or boost B-BBEE points.</p>
+
+              <div className="space-y-4 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-100">
+                {dynamicRisks.length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 flex flex-col items-center justify-center">
+                    <ShieldCheck className="h-12 w-12 text-emerald-500 mb-3" />
+                    <h5 className="font-bold text-gray-800">No Immediate Scorecard Risks</h5>
+                    <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto">Your business parameters, supplier certificates, and spend targets are fully aligned.</p>
+                  </div>
+                ) : (
+                  dynamicRisks.map((risk) => (
+                    <div
+                      key={risk.id}
+                      className={cn(
+                        "p-4 rounded-2xl border flex gap-3.5 transition-all hover:scale-[1.01] items-start",
+                        risk.severity === "critical"
+                          ? "bg-rose-50 border-rose-100 text-rose-900"
+                          : risk.severity === "warning"
+                          ? "bg-amber-50 border-amber-100 text-amber-900"
+                          : "bg-sky-50 border-sky-100 text-sky-900"
+                      )}
+                    >
+                      <div className="mt-0.5">
+                        {risk.severity === "critical" ? (
+                          <div className="p-1.5 bg-rose-500 text-white rounded-xl">
+                            <FlameKindling className="h-4 w-4" />
+                          </div>
+                        ) : risk.severity === "warning" ? (
+                          <div className="p-1.5 bg-amber-500 text-white rounded-xl">
+                            <AlertTriangle className="h-4 w-4" />
+                          </div>
+                        ) : (
+                          <div className="p-1.5 bg-sky-500 text-white rounded-xl">
+                            <Info className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <h4 className="font-extrabold text-sm tracking-tight">{risk.title}</h4>
+                        <p className={cn(
+                          "text-xs font-semibold leading-relaxed",
+                          risk.severity === "critical" ? "text-rose-700" : risk.severity === "warning" ? "text-amber-700" : "text-sky-700"
+                        )}>
+                          {risk.message}
+                        </p>
+                        <div className="pt-2 flex justify-start">
+                          <a
+                            href={risk.actionUrl}
+                            className={cn(
+                              "text-[10px] font-black uppercase tracking-wider flex items-center gap-1 px-2.5 py-1 rounded-lg border",
+                              risk.severity === "critical"
+                                ? "bg-rose-100/50 hover:bg-rose-100 border-rose-200"
+                                : risk.severity === "warning"
+                                ? "bg-amber-100/50 hover:bg-amber-100 border-amber-200"
+                                : "bg-sky-100/50 hover:bg-sky-100 border-sky-200"
+                            )}
+                          >
+                            <span>{risk.actionLabel}</span>
+                            <ArrowRight className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {selectedItem && (
-        <DetailModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          item={selectedItem}
-        />
-      )}
-    </Layout>
-  );
-}
-
-// ======================================================================
-// STAT CARD
-// ======================================================================
-function StatCard({ label, value, icon: Icon, color, description }: {
-  label: string;
-  value: number;
-  icon: LucideIcon;
-  color: 'green' | 'red' | 'amber' | 'blue';
-  description: string;
-}) {
-  const colors = {
-    green: "bg-green-50 text-green-600 border-green-100 shadow-green-100/50",
-    red: "bg-red-50 text-red-600 border-red-100 shadow-red-100/50",
-    amber: "bg-amber-50 text-amber-600 border-amber-100 shadow-amber-100/50",
-    blue: "bg-sky-50 text-sky-600 border-sky-100 shadow-sky-100/50",
-  };
-
-  const iconColors = {
-    green: "bg-green-500",
-    red: "bg-red-500",
-    amber: "bg-amber-500",
-    blue: "bg-sky-500",
-  };
-
-  return (
-    <div className={cn("p-6 rounded-3xl border shadow-lg transition-all hover:scale-[1.02]", colors[color])}>
-      <div className="flex items-center justify-between mb-4">
-        <div className={cn("p-2.5 rounded-xl shadow-lg", iconColors[color])}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
-        <span className="text-3xl font-black">{value}</span>
-      </div>
-      <h4 className="font-bold text-gray-900">{label}</h4>
-      <p className="text-xs font-medium text-gray-500 mt-1">{description}</p>
-    </div>
-  );
-}
-
-// ======================================================================
-// COMPLIANCE CARD
-// ======================================================================
-function ComplianceCard({ item, onClick }: { key?: string | number; item: ComplianceItem; onClick: () => void }) {
-  const statusConfig: Record<ComplianceStatus, { bg: string; label: string }> = {
-    compliant: { bg: "bg-green-100 text-green-700 border-green-200", label: "Compliant" },
-    overdue: { bg: "bg-red-100 text-red-700 border-red-200", label: "Overdue" },
-    action_required: { bg: "bg-red-100 text-red-700 border-red-200", label: "Action Required" },
-    expiring_soon: { bg: "bg-amber-100 text-amber-700 border-amber-200", label: "Expiring Soon" },
-    pending_setup: { bg: "bg-sky-100 text-sky-700 border-sky-200", label: "Pending Setup" },
-  };
-
-  const config = statusConfig[item.status];
-
-  const daysRemaining = useMemo(() => {
-    const targetDate = item.expiryDate?.toDate?.() || item.dueDate?.toDate?.();
-    if (!targetDate) return null;
-    return differenceInDays(targetDate, new Date());
-  }, [item]);
-
-  return (
-    <div
-      onClick={onClick}
-      className="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-sky-200 transition-all cursor-pointer relative overflow-hidden"
-    >
-      <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-        <ArrowRight className="h-4 w-4 text-sky-500" />
-      </div>
-
-      <div className="flex items-start justify-between mb-3">
-        <div className={cn("px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border", config.bg)}>
-          {config.label}
-        </div>
-      </div>
-
-      <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1 group-hover:text-sky-600 transition-colors">
-        {item.title}
-      </h3>
-      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">
-        {item.legalReference}
-      </p>
-
-      <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
-        <div className="flex items-center text-gray-500">
-          <Calendar className="h-3.5 w-3.5 mr-1.5" />
-          <span className="text-[11px] font-semibold">
-            {item.expiryDate && item.expiryDate.toDate
-              ? `Expires: ${formatDate(item.expiryDate.toDate())}`
-              : item.dueDate && item.dueDate.toDate
-              ? `Due: ${formatDate(item.dueDate.toDate())}`
-              : "Set Deadline →"}
-          </span>
-        </div>
-        {daysRemaining !== null && item.status !== 'compliant' && item.status !== 'pending_setup' && (
-          <div className={cn(
-            "text-[10px] font-black px-2 py-1 rounded-lg",
-            daysRemaining < 0 ? "bg-red-50 text-red-600" : "bg-gray-50 text-gray-600"
-          )}>
-            {daysRemaining < 0 ? `${Math.abs(daysRemaining)}d Overdue` : `${daysRemaining}d Left`}
+            </div>
+            <div className="mt-6 border-t border-gray-50 pt-4 flex items-center space-x-1.5 text-[11px] text-gray-400">
+              <Info className="h-3.5 w-3.5" />
+              <span>Risks recalculate instantly when you alter spend ledger records or supplier details.</span>
+            </div>
           </div>
-        )}
+
+          {/* Interactive Checklist Tracker */}
+          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center space-x-2 text-sky-600 mb-4">
+                <ListTodo className="h-5 w-5" />
+                <h3 className="text-lg font-black text-gray-900 tracking-tight">Audit Preparation Tasks</h3>
+              </div>
+              <p className="text-xs text-gray-400 font-medium mb-4">Step-by-step checklist to organize documents and verification requirements for SANAS audit agents.</p>
+
+              {/* Progress Bar for Checklist */}
+              <div className="bg-sky-50/50 border border-sky-100 p-3 rounded-2xl flex items-center justify-between gap-4 mb-6">
+                <span className="text-xs font-bold text-sky-900">
+                  {checklistCheckedCount} of {checklistTotalCount} actions complete
+                </span>
+                <div className="flex-1 max-w-[150px]">
+                  <div className="overflow-hidden h-2 bg-sky-200/40 rounded-full">
+                    <div
+                      style={{ width: `${checklistPercentage}%` }}
+                      className="h-full bg-sky-600 rounded-full transition-all duration-500"
+                    />
+                  </div>
+                </div>
+                <span className="text-xs font-black text-sky-600">{checklistPercentage}%</span>
+              </div>
+
+              <div className="space-y-3.5 max-h-[300px] overflow-y-auto pr-1">
+                {DEFAULT_CHECKLIST.map((task) => {
+                  const isChecked = !!checkedTasks[task.id];
+                  return (
+                    <button
+                      key={task.id}
+                      onClick={() => handleToggleTask(task.id)}
+                      className={cn(
+                        "w-full text-left p-3.5 rounded-2xl border transition-all flex items-start space-x-3 cursor-pointer",
+                        isChecked
+                          ? "bg-emerald-50/30 border-emerald-100 text-gray-500 line-through decoration-gray-300"
+                          : "bg-gray-50/30 border-gray-100 text-gray-800 hover:bg-gray-50/80"
+                      )}
+                    >
+                      <div className="mt-0.5 flex-shrink-0">
+                        {isChecked ? (
+                          <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        ) : (
+                          <div className="h-5 w-5 rounded-md border-2 border-gray-300 bg-white" />
+                        )}
+                      </div>
+                      <span className="text-xs font-semibold leading-relaxed flex-1">
+                        {task.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="mt-6 border-t border-gray-50 pt-4 text-center">
+              <a
+                href="/documents"
+                className="text-xs font-bold text-sky-600 hover:text-sky-700 inline-flex items-center gap-1 hover:underline"
+              >
+                <span>Go to Evidence Vault to upload certificates</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Audit Timeline / Pipeline Project tracker */}
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <h3 className="text-lg font-black text-gray-900 tracking-tight">Active Audit Pipeline Timeline</h3>
+              <p className="text-xs text-gray-400 font-medium mt-1">Audit readiness stages for your B-BBEE submission cycles.</p>
+            </div>
+            <a
+              href="/projects"
+              className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 bg-sky-50 px-3.5 py-2 rounded-xl transition-all"
+            >
+              <span>Manage Audit Projects</span>
+              <ChevronRight className="h-4.5 w-4.5" />
+            </a>
+          </div>
+
+          {activeProject ? (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-50">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2.5 bg-sky-50 border border-sky-100 rounded-xl text-sky-600">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-sm text-gray-900">
+                      FY{activeProject.financialYear} Compliance Project
+                    </h4>
+                    <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+                      Last synchronized on {activeProject.updatedAt ? formatDate(activeProject.updatedAt.toDate()) : "Just now"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="text-xs font-bold text-gray-400">Projected score:</span>
+                  <span className="text-sm font-black text-gray-800">{activeProject.points.total} pts</span>
+                  <span className={cn(
+                    "px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border",
+                    activeProject.projectedLevel === 9 ? "bg-red-50 text-red-700 border-red-100" : "bg-emerald-50 text-emerald-700 border-emerald-100"
+                  )}>
+                    {activeProject.projectedLevel === 9 ? "Non-Compliant" : `Level ${activeProject.projectedLevel}`}
+                  </span>
+                </div>
+              </div>
+
+              {/* Steps timeline representation */}
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                {[
+                  { value: "data_collection", label: "Data Collection" },
+                  { value: "supplier_verification", label: "Supplier Verification" },
+                  { value: "evidence_upload", label: "Evidence Upload" },
+                  { value: "internal_review", label: "Internal Review" },
+                  { value: "auditor_ready", label: "Auditor Ready" },
+                  { value: "certified", label: "Certified" },
+                ].map((stage, idx) => {
+                  const stagesOrder = [
+                    "data_collection",
+                    "supplier_verification",
+                    "evidence_upload",
+                    "internal_review",
+                    "auditor_ready",
+                    "certified",
+                  ];
+                  const currentIdx = stagesOrder.indexOf(activeProject.status);
+                  const isCurrent = activeProject.status === stage.value;
+                  const isPast = stagesOrder.indexOf(stage.value) < currentIdx;
+
+                  return (
+                    <div
+                      key={stage.value}
+                      className={cn(
+                        "p-4 rounded-2xl border transition-all flex flex-col justify-between h-20",
+                        isCurrent
+                          ? "bg-sky-50 border-sky-200 text-sky-900"
+                          : isPast
+                          ? "bg-emerald-50/50 border-emerald-100 text-emerald-900"
+                          : "bg-gray-50/40 border-gray-100 text-gray-400"
+                      )}
+                    >
+                      <div className="flex items-center justify-between text-[10px] font-bold">
+                        <span>Step {idx + 1}</span>
+                        {isPast && <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />}
+                        {isCurrent && <Clock className="h-3.5 w-3.5 text-sky-600 animate-pulse" />}
+                      </div>
+                      <span className="font-extrabold text-xs tracking-tight">{stage.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl flex flex-col items-center justify-center">
+              <Calendar className="h-10 w-10 text-gray-200 mb-3" />
+              <h5 className="font-bold text-gray-800">No B-BBEE Audit Project Initialized</h5>
+              <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto mb-4">Initialize an audit timeline to snap benchmark scorecards and track verification cycles.</p>
+              <a
+                href="/projects"
+                className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-1.5"
+              >
+                <span>Create Audit Project</span>
+              </a>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
