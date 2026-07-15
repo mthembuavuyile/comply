@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { SpendLog } from "../types";
@@ -30,7 +31,8 @@ const CATEGORIES = [
 ] as const;
 
 export default function SpendTrackerPage() {
-  const { user, business, refreshBusiness } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   const [spendLogs, setSpendLogs] = useState<SpendLog[]>([]);
   
   // Financial parameters
@@ -50,22 +52,24 @@ export default function SpendTrackerPage() {
 
   // Sync inputs with business profile
   useEffect(() => {
-    if (business) {
-      setPayrollInput(business.annualPayroll?.toString() || "");
-      setNpatInput(business.npat?.toString() || "");
-      if (!business.annualPayroll || !business.npat) {
+    if (activeClient) {
+      setPayrollInput(activeClient.annualPayroll?.toString() || "");
+      setNpatInput(activeClient.npat?.toString() || "");
+      if (!activeClient.annualPayroll || !activeClient.npat) {
         setShowConfigAlert(true);
+      } else {
+        setShowConfigAlert(false);
       }
     }
-  }, [business]);
+  }, [activeClient]);
 
   // Fetch spend logs
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const q = query(
       collection(db, "spendLogs"),
-      where("userId", "==", user.uid)
+      where("businessId", "==", activeClientId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -80,20 +84,19 @@ export default function SpendTrackerPage() {
     });
 
     return unsubscribe;
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Update business profile
   const handleUpdateFinance = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !activeClientId) return;
     setIsUpdatingProfile(true);
 
     try {
-      await updateDoc(doc(db, "businesses", user.uid), {
+      await updateDoc(doc(db, "businesses", activeClientId), {
         annualPayroll: Number(payrollInput),
         npat: Number(npatInput),
       });
-      await refreshBusiness();
       setShowConfigAlert(false);
     } catch (error) {
       console.error("Error updating business finances:", error);
@@ -105,10 +108,11 @@ export default function SpendTrackerPage() {
   // Log new spend
   const handleSaveSpend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const data = {
       userId: user.uid,
+      businessId: activeClientId,
       category,
       description,
       amount: Number(amount),
@@ -155,8 +159,8 @@ export default function SpendTrackerPage() {
   };
 
   // Math totals for dashboard
-  const payroll = business?.annualPayroll || 0;
-  const npat = business?.npat || 0;
+  const payroll = activeClient?.annualPayroll || 0;
+  const npat = activeClient?.npat || 0;
 
   const targets = useMemo(() => {
     return {
@@ -189,6 +193,38 @@ export default function SpendTrackerPage() {
   const totalTargetSpend = useMemo(() => {
     return Object.values(targets).reduce((a: number, b: number) => a + b, 0);
   }, [targets]);
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <Coins className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to manage spend logs.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

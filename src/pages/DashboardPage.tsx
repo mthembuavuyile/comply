@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { Supplier, SpendLog, ScorecardProject, Alert } from "../types";
@@ -52,7 +53,8 @@ const DEFAULT_CHECKLIST: ChecklistItem[] = [
 ];
 
 export default function DashboardPage() {
-  const { user, business } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [spendLogs, setSpendLogs] = useState<SpendLog[]>([]);
   const [projects, setProjects] = useState<ScorecardProject[]>([]);
@@ -61,10 +63,10 @@ export default function DashboardPage() {
 
   // Fetch Firestore collections
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const unsubSuppliers = onSnapshot(
-      query(collection(db, "suppliers"), where("userId", "==", user.uid)),
+      query(collection(db, "suppliers"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSuppliers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Supplier[]);
       },
@@ -72,7 +74,7 @@ export default function DashboardPage() {
     );
 
     const unsubSpend = onSnapshot(
-      query(collection(db, "spendLogs"), where("userId", "==", user.uid)),
+      query(collection(db, "spendLogs"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSpendLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SpendLog[]);
       },
@@ -80,7 +82,7 @@ export default function DashboardPage() {
     );
 
     const unsubProjects = onSnapshot(
-      query(collection(db, "scorecardProjects"), where("userId", "==", user.uid)),
+      query(collection(db, "scorecardProjects"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setProjects(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as ScorecardProject[]);
       },
@@ -88,7 +90,7 @@ export default function DashboardPage() {
     );
 
     const unsubAlerts = onSnapshot(
-      query(collection(db, "alerts"), where("userId", "==", user.uid), where("read", "==", false)),
+      query(collection(db, "alerts"), where("businessId", "==", activeClientId), where("read", "==", false)),
       (snapshot) => {
         setAlerts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Alert[]);
       },
@@ -101,12 +103,12 @@ export default function DashboardPage() {
       unsubProjects();
       unsubAlerts();
     };
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Load interactive checklist state from localStorage
   useEffect(() => {
-    if (user) {
-      const stored = localStorage.getItem(`vylex_bbbee_checklist_${user.uid}`);
+    if (activeClientId) {
+      const stored = localStorage.getItem(`vylex_bbbee_checklist_${activeClientId}`);
       if (stored) {
         try {
           setCheckedTasks(JSON.parse(stored));
@@ -117,20 +119,20 @@ export default function DashboardPage() {
         setCheckedTasks({});
       }
     }
-  }, [user]);
+  }, [activeClientId]);
 
   // Toggle checklist tasks
   const handleToggleTask = (taskId: string) => {
-    if (!user) return;
+    if (!activeClientId) return;
     const nextState = { ...checkedTasks, [taskId]: !checkedTasks[taskId] };
     setCheckedTasks(nextState);
-    localStorage.setItem(`vylex_bbbee_checklist_${user.uid}`, JSON.stringify(nextState));
+    localStorage.setItem(`vylex_bbbee_checklist_${activeClientId}`, JSON.stringify(nextState));
   };
 
   // Calculate live scorecard
   const liveScorecard = useMemo(() => {
-    return calculateScorecard(business, suppliers, spendLogs);
-  }, [business, suppliers, spendLogs]);
+    return calculateScorecard(activeClient, suppliers, spendLogs);
+  }, [activeClient, suppliers, spendLogs]);
 
   // Active Project Timeline (latest year)
   const activeProject = useMemo(() => {
@@ -169,7 +171,7 @@ export default function DashboardPage() {
     const today = new Date();
 
     // 1. Missing Financial Config
-    if (!business?.annualPayroll || !business?.npat) {
+    if (!activeClient?.annualPayroll || !activeClient?.npat) {
       list.push({
         id: "missing_finance_config",
         severity: "critical",
@@ -267,19 +269,19 @@ export default function DashboardPage() {
     }
 
     // 8. Low Ownership Warning
-    if (business && (business.blackOwnershipPercent || 0) < 25.1) {
+    if (activeClient && (activeClient.blackOwnershipPercent || 0) < 25.1) {
       list.push({
         id: "low_black_ownership",
         severity: "warning",
         title: "Sub-Optimal Ownership points",
-        message: `Black economic interest is currently ${(business.blackOwnershipPercent || 0)}%. A minimum of 25.1% is required to maximize points and avoid sub-minimum penalties.`,
+        message: `Black economic interest is currently ${(activeClient.blackOwnershipPercent || 0)}%. A minimum of 25.1% is required to maximize points and avoid sub-minimum penalties.`,
         actionUrl: "/calculator",
         actionLabel: "Simulate Ownership",
       });
     }
 
     return list;
-  }, [business, suppliers, liveScorecard]);
+  }, [activeClient, suppliers, liveScorecard]);
 
   // Scorecard categories formatted nicely for horizontal progression bars
   const scorecardCategories = useMemo(() => {
@@ -338,7 +340,39 @@ export default function DashboardPage() {
   const checklistCheckedCount = Object.values(checkedTasks).filter(Boolean).length;
   const checklistPercentage = Math.round((checklistCheckedCount / checklistTotalCount) * 100);
 
-  const sectorLabel = business ? getSectorLabel(business.sector) : "";
+  const sectorLabel = activeClient ? getSectorLabel(activeClient.sector) : "";
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <Building2 className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to view this dashboard.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -348,7 +382,7 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                {business?.businessName || "Vylex Comply"}
+                {activeClient?.businessName || "ComplyOS"}
               </h1>
               {sectorLabel && (
                 <span className="px-3 py-1 bg-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-sky-200 shadow-sm shadow-sky-50/50">
@@ -444,14 +478,14 @@ export default function DashboardPage() {
                 <div className="text-right">
                   <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Ownership Weight</p>
                   <p className="text-xl font-black text-gray-900 mt-0.5">
-                    {business?.blackOwnershipPercent || 0}%
+                    {activeClient?.blackOwnershipPercent || 0}%
                   </p>
                 </div>
               </div>
               <div>
                 <h4 className="font-extrabold text-gray-900">Black Equity Interest</h4>
                 <p className="text-xs text-gray-400 font-medium mt-1">
-                  Women ownership matches: <span className="font-bold text-gray-700">{business?.blackWomenOwnershipPercent || 0}%</span>
+                  Women ownership matches: <span className="font-bold text-gray-700">{activeClient?.blackWomenOwnershipPercent || 0}%</span>
                 </p>
               </div>
             </div>

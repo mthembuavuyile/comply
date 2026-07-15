@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import Layout from "../components/Layout";
@@ -39,26 +40,37 @@ import {
 import { cn } from "../lib/utils";
 import { GoogleGenAI } from "@google/genai";
 
-type SettingsTab = 'profile' | 'notifications' | 'integrations' | 'team' | 'billing';
+type SettingsTab = 'practice' | 'profile' | 'notifications' | 'integrations' | 'team' | 'billing';
 
 const TABS: { id: SettingsTab; label: string; icon: any }[] = [
-  { id: 'profile', label: 'Business Profile', icon: Building2 },
+  { id: 'practice', label: 'Practice Profile', icon: Users },
+  { id: 'profile', label: 'Client Profile', icon: Building2 },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'integrations', label: 'Connected Accounts', icon: Link2 },
-  { id: 'team', label: 'Team Members', icon: Users },
   { id: 'billing', label: 'Subscription', icon: CreditCard },
 ];
 
 export default function SettingsPage() {
-  const { user, business, refreshBusiness } = useAuth();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
+  const { user } = useAuth();
+  const { clientsLoading } = useClient();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('practice');
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Settings</h1>
-          <p className="text-gray-500 font-medium mt-1">Manage your business profile and preferences.</p>
+          <p className="text-gray-500 font-medium mt-1">Manage your practice and client profiles.</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -85,6 +97,7 @@ export default function SettingsPage() {
 
           {/* Tab Content */}
           <div className="flex-1 min-w-0">
+            {activeTab === 'practice' && <PracticeProfileTab />}
             {activeTab === 'profile' && <BusinessProfileTab />}
             {activeTab === 'notifications' && <ComingSoonTab title="Notifications" description="Configure email preferences and reminder lead times (7 days, 30 days before deadline)." />}
             {activeTab === 'integrations' && <IntegrationsTab />}
@@ -101,7 +114,8 @@ export default function SettingsPage() {
 // BUSINESS PROFILE TAB
 // ======================================================================
 function BusinessProfileTab() {
-  const { user, business, refreshBusiness } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, refreshClients } = useClient();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [sectorChanged, setSectorChanged] = useState(false);
@@ -118,8 +132,8 @@ function BusinessProfileTab() {
   });
 
   useEffect(() => {
-    if (business) {
-      const biz = business as any;
+    if (activeClient) {
+      const biz = activeClient as any;
       setForm({
         businessName: biz.businessName || "",
         sector: biz.sector || "general",
@@ -131,7 +145,7 @@ function BusinessProfileTab() {
         cipcRegistered: biz.cipcRegistered ?? false,
       });
     }
-  }, [business]);
+  }, [activeClient]);
 
   const update = (patch: Partial<typeof form>) => {
     if (patch.sector && patch.sector !== form.sector) {
@@ -142,10 +156,10 @@ function BusinessProfileTab() {
   };
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, "businesses", user.uid), {
+      await updateDoc(doc(db, "businesses", activeClientId), {
         businessName: form.businessName.trim(),
         sector: form.sector,
         customSectorText: form.sector === "other" ? form.customSectorText.trim() : "",
@@ -156,16 +170,36 @@ function BusinessProfileTab() {
         cipcRegistered: form.cipcRegistered,
         updatedAt: serverTimestamp(),
       });
-      await refreshBusiness();
+      refreshClients();
       setSaved(true);
       setSectorChanged(false);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, `businesses/${user.uid}`);
+      handleFirestoreError(error, OperationType.WRITE, `businesses/${activeClientId}`);
     } finally {
       setSaving(false);
     }
   };
+
+  if (!activeClient) {
+    return (
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center">
+        <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+          <Building2 className="h-8 w-8 text-sky-400" />
+        </div>
+        <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+        <p className="text-gray-500 font-medium text-sm mb-6">
+          Please select a client business from the portfolio to edit their profile.
+        </p>
+        <a
+          href="/clients"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+        >
+          Go to Clients Portfolio
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
@@ -523,8 +557,8 @@ function IntegrationsTab() {
           {testResult && (
             <div className={cn(
               "p-4 rounded-2xl border text-xs font-semibold flex items-start gap-3 animate-in fade-in duration-200",
-              testResult.success 
-                ? "bg-emerald-50 border-emerald-200 text-emerald-800" 
+              testResult.success
+                ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                 : "bg-red-50 border-red-200 text-red-800"
             )}>
               <div className="mt-0.5 flex-shrink-0">
@@ -554,7 +588,7 @@ function IntegrationsTab() {
               "Test Key Connection"
             )}
           </button>
-          
+
           <button
             onClick={handleSave}
             disabled={!apiKey.trim()}
@@ -565,25 +599,21 @@ function IntegrationsTab() {
         </div>
       </div>
 
-      {/* Accounting integrations placeholder */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden opacity-85">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Link2 className="h-5 w-5 text-gray-400" />
-            Financial & ERP Integrations
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">Connect your accounting systems to pull financial logs and calculate SD/ED turnover targets automatically.</p>
-        </div>
-        <div className="p-8 text-center bg-gray-50/20">
-          <div className="flex flex-wrap justify-center gap-4 mb-4 max-w-sm mx-auto opacity-40 grayscale">
-            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">XERO</div>
-            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">SAGE</div>
-            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 font-black text-sm">QUICKBOOKS</div>
-          </div>
-          <span className="text-[9px] bg-gray-100 text-gray-600 border border-gray-200 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
-            Coming Soon
-          </span>
-        </div>
+    </div>
+  );
+}
+
+// ======================================================================
+// PRACTICE PROFILE TAB
+// ======================================================================
+function PracticeProfileTab() {
+  return (
+    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 text-center border border-gray-100">
+      <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+      <h2 className="text-xl font-bold text-gray-900 mb-2">Practice Profile</h2>
+      <p className="text-gray-500 mb-6">Manage your practice details and team members here.</p>
+      <div className="inline-block px-4 py-1.5 bg-gray-100 text-gray-600 font-bold text-xs rounded-full uppercase tracking-wider">
+        Coming Soon
       </div>
     </div>
   );

@@ -3,24 +3,27 @@ import {
   ShieldCheck,
   BarChart3,
   Clock,
-  Map,
   CheckCircle2,
   ArrowRight,
   ChevronRight,
-  Globe,
   Lock,
   Building2,
   ArrowUpRight,
   FileText,
   TrendingUp,
   AlertTriangle,
-  FileWarning,
+  FolderOpen,
+  Sparkles,
+  Users,
+  Coins,
+  ClipboardList,
+  Check,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../App";
 
 const FONT = `
-  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap');
 `;
 
 export default function LandingPage() {
@@ -35,9 +38,9 @@ export default function LandingPage() {
           --ink-2:   #0A2E5C;
           --muted:   #64748b;
           --line:    #e2e8f0;
-          --accent:  #FBA919;
-          --accent-lt: #FEF3C7;
-          --accent-md: #F59E0B;
+          --accent:  #0ea5e9;
+          --accent-lt: #e0f2fe;
+          --accent-md: #0284c7;
           --white:   #ffffff;
           --off:     #f8fafc;
         }
@@ -63,9 +66,9 @@ export default function LandingPage() {
         .logo-mark {
           background: var(--accent); padding: 8px; border-radius: 10px;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 12px rgba(251, 169, 25, 0.2);
+          box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
         }
-        .logo-text { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -0.03em; }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
         .logo-text span { color: var(--accent); }
 
         .nav-links { display: flex; align-items: center; gap: 32px; }
@@ -81,23 +84,17 @@ export default function LandingPage() {
         }
         .btn-primary:hover { background: #000; transform: translateY(-1px); }
 
-        .btn-ghost {
-          font-size: 14px; font-weight: 600; color: var(--ink);
-          text-decoration: none; transition: opacity 0.2s;
-        }
-        .btn-ghost:hover { opacity: 0.7; }
-
         /* HERO */
         .hero {
           padding: 160px 32px 100px;
           max-width: 1280px; margin: 0 auto;
-          display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center;
+          display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 60px; align-items: center;
         }
         .hero-badge {
           display: inline-flex; align-items: center; gap: 8px;
           padding: 6px 14px;
           background: var(--accent-lt); border: 1px solid var(--accent); border-radius: 100px;
-          font-size: 11px; font-weight: 700; color: var(--accent);
+          font-size: 11px; font-weight: 700; color: var(--accent-md);
           margin-bottom: 28px; text-transform: uppercase; letter-spacing: 0.05em;
         }
         .hero-badge-dot {
@@ -107,28 +104,28 @@ export default function LandingPage() {
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
         .hero-h1 {
-          font-size: clamp(48px, 6vw, 68px);
+          font-size: clamp(44px, 5.5vw, 64px);
           font-weight: 400; line-height: 1.05;
           letter-spacing: -0.04em; margin-bottom: 28px; color: var(--ink);
         }
-        .hero-h1 strong { font-weight: 700; color: var(--ink); }
+        .hero-h1 strong { font-weight: 800; color: var(--ink); }
 
         .hero-sub {
           font-size: 18px; line-height: 1.65;
           color: var(--muted); font-weight: 450; margin-bottom: 48px;
-          max-width: 520px;
+          max-width: 550px;
         }
 
         .hero-actions { display: flex; align-items: center; gap: 16px; }
         .btn-hero {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 16px 32px; background: var(--accent);
+          padding: 16px 32px; background: var(--ink);
           color: #fff; font-size: 16px; font-weight: 700;
           border-radius: 12px; text-decoration: none;
-          box-shadow: 0 10px 25px -5px rgba(251, 169, 25, 0.4);
+          box-shadow: 0 10px 25px -5px rgba(5, 27, 56, 0.3);
           transition: all 0.2s ease;
         }
-        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(251, 169, 25, 0.5); background: var(--accent-md); }
+        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(5, 27, 56, 0.4); background: #000; }
 
         .btn-outline {
           display: inline-flex; align-items: center; gap: 8px;
@@ -140,108 +137,121 @@ export default function LandingPage() {
         }
         .btn-outline:hover { border-color: var(--ink); color: #000; }
 
-        /* DASHBOARD PREVIEW */
+        /* PORTFOLIO MOCKUP */
         .preview-container {
           position: relative;
-          perspective: 1000px;
         }
         .preview-card {
           background: #fff;
           border: 1px solid var(--line);
           border-radius: 24px;
-          box-shadow: 20px 40px 80px -10px rgba(0,0,0,0.12);
+          box-shadow: 20px 40px 80px -10px rgba(0,0,0,0.1);
           overflow: hidden;
-          background: #fff;
-          padding: 32px;
-          transform: rotateY(-5deg) rotateX(2deg);
+          padding: 24px;
         }
-        .preview-header {
-           display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;
+        .mock-header {
+          display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+          border-bottom: 1px solid var(--line); padding-bottom: 16px;
         }
-        .preview-score {
-          display: flex; flex-direction: column; align-items: center; gap: 12px;
-        }
-        .preview-svg-ring {
-          width: 120px; height: 120px; transform: rotate(-90deg);
-        }
-        .preview-ring-text {
-          position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .preview-score-val { font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1; }
-        .preview-score-lbl { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--muted); }
-
-        .preview-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
-        .preview-stat {
-          padding: 16px; border-radius: 16px; border: 1px solid var(--line);
-        }
-        .stat-green { background: #f0fdf4; border-color: #dcfce7; color: #166534; }
-        .stat-red { background: #fef2f2; border-color: #fee2e2; color: #991b1b; }
-        .stat-amber { background: #fffbeb; border-color: #fef3c7; color: #92400e; }
-
-        .upcoming-row { padding-top: 24px; }
-        .upcoming-item {
+        .mock-title { font-size: 14px; font-weight: 800; color: var(--ink); }
+        .mock-badge { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 9999px; }
+        .client-list { display: flex; flex-direction: column; gap: 10px; }
+        .client-row {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 12px 0; border-bottom: 1px solid var(--line);
+          padding: 12px; border: 1px solid var(--line); border-radius: 12px;
+          background: var(--off);
         }
-        .upcoming-item:last-child { border-bottom: none; }
-        .upcoming-name { font-size: 13px; font-weight: 600; color: var(--ink); }
-        .upcoming-org { font-size: 11px; color: var(--muted); font-weight: 500; }
-        .upcoming-date { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+        .client-info { display: flex; align-items: center; gap: 10px; }
+        .client-avatar { background: var(--accent-lt); color: var(--accent-md); border-radius: 8px; padding: 6px; display: flex; }
+        .client-name { font-size: 12px; font-weight: 700; color: var(--ink); }
+        .client-sector { font-size: 9px; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-top: 1px; }
+        
+        .level-badge {
+          font-size: 10px; font-weight: 900; text-transform: uppercase;
+          padding: 4px 10px; border-radius: 8px; border: 1px solid;
+        }
+        .lvl-1 { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+        .lvl-4 { background: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+        .lvl-nc { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
 
         /* TRUST BAR */
-        .trust-bar { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 32px; }
-        .trust-bar-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
-        .trust-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
-        .trust-logos { display: flex; align-items: center; gap: 48px; flex-wrap: wrap; opacity: 0.6; grayscale: 1; }
-        .trust-logo { font-size: 14px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+        .trust-bar { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 24px 32px; background: var(--off); }
+        .trust-bar-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .trust-label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .trust-logos { display: flex; align-items: center; gap: 48px; opacity: 0.7; }
+        .trust-logo { font-size: 13px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 6px; }
 
         /* SECTIONS */
         .section { padding: 120px 32px; }
         .section-tag { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 16px; }
         .section-h2 { font-size: clamp(36px, 5vw, 52px); font-weight: 400; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 24px; }
-        .section-h2 strong { font-weight: 700; }
+        .section-h2 strong { font-weight: 800; }
         .section-sub { font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 600px; }
 
         /* FEATURES GRID */
         .features-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; margin-top: 80px; }
         .feature-item { }
         .f-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-        .feature-h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; }
+        .feature-h3 { font-size: 20px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.01em; color: var(--ink); }
         .feature-p { font-size: 15px; line-height: 1.6; color: var(--muted); }
 
-        /* SECURITY BAND */
-        .security-band { background: var(--off); padding: 80px 32px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-        .sec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; max-width: 1280px; margin: 0 auto; }
-        .sec-item { display: flex; flex-direction: column; gap: 12px; }
-        .sec-h4 { font-size: 15px; font-weight: 700; color: var(--ink); }
-        .sec-p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+        /* PRICING */
+        .pricing-section { background: var(--off); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 60px; max-width: 1280px; margin-left: auto; margin-right: auto; }
+        .pricing-card {
+          background: #white; border: 1px solid var(--line); border-radius: 24px; padding: 40px;
+          display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s;
+          background: #fff;
+        }
+        .pricing-card.premium {
+          border-color: var(--accent); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1); position: relative;
+        }
+        .pricing-card.premium::top {
+          position: absolute; top: -12px; right: 24px; background: var(--accent); color: #fff;
+          font-size: 10px; font-weight: 800; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase;
+        }
+        .price-h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
+        .price-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+        .price-val { font-size: 36px; font-weight: 900; color: var(--ink); margin-bottom: 4px; }
+        .price-val span { font-size: 14px; font-weight: 600; color: var(--muted); }
+        .price-features { list-style: none; margin-top: 32px; margin-bottom: 32px; display: flex; flex-direction: column; gap: 14px; }
+        .price-feature { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--muted); }
+        .price-feature svg { color: var(--accent); }
+        
+        .btn-price {
+          display: block; width: 100%; text-align: center; padding: 14px; border-radius: 12px;
+          font-weight: 700; text-decoration: none; font-size: 14px; transition: all 0.2s;
+        }
+        .btn-price.primary { background: var(--accent); color: #fff; box-shadow: 0 8px 20px rgba(14, 165, 233, 0.25); }
+        .btn-price.primary:hover { background: var(--accent-md); }
+        .btn-price.secondary { border: 1.5px solid var(--line); color: var(--ink); }
+        .btn-price.secondary:hover { border-color: var(--ink); }
 
         /* CTA */
-        .cta-wrap { max-width: 1280px; margin: 0 auto; background: var(--ink); border-radius: 32px; padding: 100px 80px; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; }
-        .cta-content { max-width: 600px; }
-        .cta-h2 { font-size: 48px; font-weight: 400; color: #fff; letter-spacing: -0.04em; line-height: 1.1; }
-        .cta-h2 strong { font-weight: 700; }
+        .cta-wrap { max-width: 1280px; margin: 0 auto; background: var(--ink); border-radius: 32px; padding: 80px; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; }
+        .cta-content { max-width: 650px; }
+        .cta-h2 { font-size: 40px; font-weight: 400; color: #fff; letter-spacing: -0.04em; line-height: 1.1; }
+        .cta-h2 strong { font-weight: 800; }
         .cta-p { font-size: 18px; color: rgba(255,255,255,0.6); margin-top: 20px; }
 
         /* FOOTER */
         .footer { padding: 100px 32px 40px; border-top: 1px solid var(--line); }
         .f-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 80px; }
         .f-copy { font-size: 14px; line-height: 1.7; color: var(--muted); margin-top: 24px; max-width: 300px; }
-        .f-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--ink); letter-spacing: 0.1em; margin-bottom: 24px; }
+        .f-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--ink); letter-spacing: 0.1em; margin-bottom: 24px; }
         .f-links { list-style: none; display: flex; flex-direction: column; gap: 16px; }
         .f-link { font-size: 15px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
         .f-link:hover { color: var(--accent); }
 
         @media (max-width: 1024px) {
-          .hero, .f-grid { grid-template-columns: 1fr; gap: 64px; }
+          .hero, .f-grid, .pricing-grid { grid-template-columns: 1fr; gap: 64px; }
           .hero { padding: 140px 24px 80px; }
           .preview-container { order: -1; margin-bottom: 40px; }
-          .preview-card { transform: none; }
-          .features-row, .sec-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+          .features-row { grid-template-columns: 1fr 1fr; gap: 40px; }
           .cta-wrap { flex-direction: column; align-items: flex-start; gap: 48px; padding: 64px 32px; }
         }
         @media (max-width: 640px) {
-          .features-row, .sec-grid, .f-grid { grid-template-columns: 1fr; }
+          .features-row, .f-grid { grid-template-columns: 1fr; }
           .nav-links .nav-link { display: none; }
         }
       `}</style>
@@ -258,13 +268,12 @@ export default function LandingPage() {
               <span className="logo-text serif">Comply<span>OS</span></span>
             </Link>
             <div className="nav-links">
-              <a href="#features" className="nav-link">Platform</a>
-              <a href="#solutions" className="nav-link">Sectors</a>
-              <a href="#" className="nav-link">Pricing</a>
+              <a href="#features" className="nav-link">Features</a>
+              <a href="#pricing" className="nav-link">Pricing</a>
               {user ? (
-                <Link to="/dashboard" className="btn-primary">Dashboard</Link>
+                <Link to="/dashboard" className="btn-primary">Practice Dashboard</Link>
               ) : (
-                <Link to="/auth" className="btn-primary">Get started</Link>
+                <Link to="/auth" className="btn-primary">Sign In</Link>
               )}
             </div>
           </div>
@@ -277,18 +286,19 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "circOut" }}
           >
+
             <h1 className="hero-h1">
-              Compliance is now <strong>simply managed.</strong>
+              The B-BBEE platform <strong>your practice needs.</strong>
             </h1>
             <p className="hero-sub">
-              ComplyOS centralises your CIPC, SARS, and B-BBEE obligations into an intelligent dashboard — because South African businesses should track growth, not deadlines.
+              Manage scorecard preparation, supplier verification, and audit evidence for every client — from one centralized dashboard. Built for South African accountants and consultants.
             </p>
             <div className="hero-actions">
               <Link to="/auth" className="btn-hero">
-                Start your free trial <ArrowRight size={18} />
+                Start Free Trial <ArrowRight size={18} />
               </Link>
               <a href="#features" className="btn-outline">
-                How it works
+                See How It Works
               </a>
             </div>
           </motion.div>
@@ -301,68 +311,30 @@ export default function LandingPage() {
           >
             <div style={{ position: "absolute", top: -20, left: -20, right: 20, bottom: 20, background: "var(--accent-lt)", borderRadius: 32, filter: "blur(80px)", opacity: 0.4 }} />
             <div className="preview-card">
-              <div className="preview-header">
-                <div className="preview-score">
-                  <div style={{ position: "relative", display: "flex", alignItems: "center", justifyCenter: "center" }}>
-                    <svg className="preview-svg-ring">
-                      <circle cx="60" cy="60" r="54" stroke="#f1f5f9" strokeWidth="8" fill="none" />
-                      <circle cx="60" cy="60" r="54" stroke="var(--accent)" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="339.29" strokeDashoffset={339.29 - (339.29 * 94) / 100} />
-                    </svg>
-                    <div className="preview-ring-text" style={{ width: 120, height: 120 }}>
-                      <span className="preview-score-val">94%</span>
-                      <span className="preview-score-lbl">Health</span>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Overdue</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--ink)" }}>0</div>
-                  </div>
-                  <div style={{ background: "var(--off)", padding: "10px 14px", borderRadius: 12, border: "1px solid var(--line)" }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>Due Soon</div>
-                    <div style={{ fontSize: 18, fontWeight: 800, color: "var(--accent)" }}>2</div>
-                  </div>
-                </div>
+              <div className="mock-header">
+                <span className="mock-title">Practice Client Portfolio</span>
+                <span className="mock-badge">Active Management</span>
               </div>
-
-              <div className="preview-grid">
-                <div className="preview-stat stat-green">
-                  <ShieldCheck size={14} style={{ marginBottom: 8 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700 }}>Compliance Active</div>
-                  <div style={{ fontSize: 10, opacity: 0.8 }}>All SARS returns up to date</div>
-                </div>
-                <div className="preview-stat stat-amber">
-                  <Clock size={14} style={{ marginBottom: 8 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700 }}>Due in 7 days</div>
-                  <div style={{ fontSize: 10, opacity: 0.8 }}>B-BBEE Audit Review</div>
-                </div>
-              </div>
-
-              <div className="upcoming-row">
+              
+              <div className="client-list">
                 {[
-                  { name: "VAT201 Submission", org: "SARS eFiling", date: "Mar 31", tag: "Urgent", cls: "tag-red", bg: "#fee2e2", txt: "#991b1b" },
-                  { name: "CIPC Annual Return", org: "CIPC Portal", date: "Apr 25", tag: "Tracked", cls: "tag-green", bg: "#dcfce7", txt: "#166534" },
-                ].map((d) => (
-                  <div className="upcoming-item" key={d.name}>
-                    <div>
-                      <div className="upcoming-name">{d.name}</div>
-                      <div className="upcoming-org">{d.org}</div>
+                  { name: "Siyakhula Logistics (Pty) Ltd", sector: "Transport & Logistics", level: "Level 1", cls: "lvl-1" },
+                  { name: "Vanguard Tech Solutions", sector: "Information Technology", level: "Level 4", cls: "lvl-4" },
+                  { name: "Phola Construction", sector: "Construction & Infrastructure", level: "NC (Level 9)", cls: "lvl-nc" }
+                ].map((c, i) => (
+                  <div className="client-row" key={i}>
+                    <div className="client-info">
+                      <div className="client-avatar">
+                        <Building2 size={16} />
+                      </div>
+                      <div>
+                        <div className="client-name">{c.name}</div>
+                        <div className="client-sector">{c.sector}</div>
+                      </div>
                     </div>
-                    <span className="upcoming-date" style={{ background: d.bg, color: d.txt }}>{d.tag}</span>
+                    <span className={`level-badge ${c.cls}`}>{c.level}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* FLOATING DECORATIONS */}
-            <div style={{ position: "absolute", bottom: -20, right: 40, background: "#fff", border: "1px solid var(--line)", padding: "12px 20px", borderRadius: 16, boxShadow: "0 10px 30px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ background: "#dcfce7", padding: 6, borderRadius: 8 }}>
-                <TrendingUp size={16} color="#16a34a" />
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 800 }}>R0.00</div>
-                <div style={{ fontSize: 10, color: "var(--muted)", fontWeight: 600 }}>Total Penalties</div>
               </div>
             </div>
           </motion.div>
@@ -371,12 +343,11 @@ export default function LandingPage() {
         {/* TRUST STRIP */}
         <div className="trust-bar">
           <div className="trust-bar-inner">
-            <span className="trust-label">Regulatory Alignment</span>
+            <span className="trust-label">Trusted Practice Partners</span>
             <div className="trust-logos">
-              <span className="trust-logo"><Building2 size={16} /> SARS eFiling</span>
-              <span className="trust-logo"><FileText size={16} /> CIPC Portal</span>
-              <span className="trust-logo"><ShieldCheck size={16} /> B-BBEE Commission</span>
-              <span className="trust-logo"><Lock size={16} /> Companies Act 71</span>
+              <span className="trust-logo"><Users size={16} /> 50+ Accounting Practices</span>
+              <span className="trust-logo"><ShieldCheck size={16} /> Verified SANAS Formats</span>
+              <span className="trust-logo"><Building2 size={16} /> South African Corporates</span>
             </div>
           </div>
         </div>
@@ -384,33 +355,51 @@ export default function LandingPage() {
         {/* FEATURES OVERVIEW */}
         <section id="features" className="section">
           <div className="section-inner">
-            <div className="section-tag">The Operating System</div>
+            <div className="section-tag">Features Overview</div>
             <h2 className="section-h2 serif">
-              Professional compliance,<br /><strong>without the professional fee.</strong>
+              Everything you need to run<br /><strong>B-BBEE advisory at scale.</strong>
             </h2>
             <p className="section-sub">
-              ComplyOS simplifies complex South African regulatory cycles into actionable tasks. No more guessing, no more manual calendars.
+              Ditch the complex spreadsheet trackers. ComplyOS gives you professional, automated B-BBEE modeling software built for practices.
             </p>
 
             <div className="features-row">
               {[
                 {
-                  icon: BarChart3,
-                  title: "Real-time Health Score",
-                  desc: "An instant, high-level visualization of your business's compliance fitness across tax, labor, and company categories.",
+                  icon: FolderOpen,
+                  title: "Multi-Client Portfolio",
+                  desc: "Manage 100+ clients from a single, unified login. Switch between client dashboards instantly and view audit statuses at a glance.",
                   bg: "var(--accent-lt)", color: "var(--accent-md)"
                 },
                 {
-                  icon: Map,
-                  title: "Automated Roadmaps",
-                  desc: "A custom timeline of every CIPC, SARS, and B-BBEE submission required for your sector and company structure.",
+                  icon: BarChart3,
+                  title: "Live Scorecard Engine",
+                  desc: "Get real-time points computations across all 5 scorecard elements: Ownership, Skills, Procurement, ESD, and SED.",
+                  bg: "#ecfdf5", color: "#047857"
+                },
+                {
+                  icon: FileText,
+                  title: "Supplier Certificate Vault",
+                  desc: "AI-powered OCR extracts B-BBEE levels, ownership, and expiry dates from uploaded certificates. Keeps tracking expiration dates automatically.",
+                  bg: "#fff1f2", color: "#e11d48"
+                },
+                {
+                  icon: Coins,
+                  title: "Spend Gap Intelligence",
+                  desc: "Calculate payroll and profit-based spending targets. Map skills training, enterprise, supplier, and socio-economic contributions live.",
                   bg: "#fdf4ff", color: "#a21caf"
                 },
                 {
-                  icon: AlertTriangle,
-                  title: "Tiered Notifications",
-                  desc: "Smart alerts at 60, 30, and 7-day intervals. Escalate overdue items to directorship before they become penalties.",
+                  icon: ClipboardList,
+                  title: "Audit-Ready Evidence",
+                  desc: "Compile one-click evidence ZIP packs containing sworn affidavits, supplier certificates, and bank payment receipts structured for audit agents.",
                   bg: "#fffbeb", color: "#d97706"
+                },
+                {
+                  icon: Sparkles,
+                  title: "AI B-BBEE Copilot",
+                  desc: "Consult our Gemini-powered AI advisor for natural language answers to complex point calculations, priority targets, and compliance queries.",
+                  bg: "#e0e7ff", color: "#4338ca"
                 }
               ].map((f, i) => (
                 <div className="feature-item" key={i}>
@@ -425,23 +414,69 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* SECURITY & GOVERNANCE */}
-        <section className="security-band">
-          <div className="sec-grid">
-            {[
-              { icon: Lock, title: "AES-256 Encryption", desc: "Your legal documents and company data are encrypted with bank-grade standards." },
-              { icon: ShieldCheck, title: "POPIA Compliant", desc: "Full alignment with the Protection of Personal Information Act protocols." },
-              { icon: Building2, title: "Local Data Residency", desc: "Data stored securely on South African soil, never leaving the jurisdiction." },
-              { icon: FileWarning, title: "Audit Ready", desc: "Every action and submission generates an immutable log for future auditing." },
-            ].map((s, i) => (
-              <div className="sec-item" key={i}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <s.icon size={16} color="var(--accent)" />
-                  <h4 className="sec-h4 uppercase">{s.title}</h4>
+        {/* PRICING */}
+        <section id="pricing" className="section pricing-section">
+          <div className="section-inner" style={{ maxWidth: 1280, margin: "0 auto" }}>
+            <div style={{ textAlign: "center" }}>
+              <div className="section-tag" style={{ margin: "0 auto 16px" }}>Transparent Practice Pricing</div>
+              <h2 className="section-h2 serif">Plans designed to <strong>scale with your clients.</strong></h2>
+              <p className="section-sub" style={{ margin: "0 auto" }}>No long term contracts. Upgrade or downgrade as your client count grows.</p>
+            </div>
+
+            <div className="pricing-grid">
+              {[
+                {
+                  title: "Starter Practice",
+                  desc: "For small firms and independent consultants starting out with B-BBEE.",
+                  price: "R499",
+                  clients: "Up to 5 clients",
+                  features: ["Live Scorecard Engine", "Supplier CRM & OCR", "Interactive What-If Calculators", "Basic Evidence Vaults", "1 Practitioner Login"],
+                  btnCls: "secondary",
+                  btnText: "Start Free Trial"
+                },
+                {
+                  title: "Professional Firm",
+                  desc: "The sweet spot for established firms managing mid-sized client books.",
+                  price: "R1,499",
+                  clients: "Up to 50 clients",
+                  features: ["Everything in Starter", "Spend Gap Intel & Alerts", "Scorecard Sync & History", "AI B-BBEE Copilot Access", "Up to 5 Practitioner Logins", "Priority Local Email Support"],
+                  btnCls: "primary",
+                  btnText: "Most Popular - Trial"
+                },
+                {
+                  title: "Enterprise Practice",
+                  desc: "Customized infrastructure for large accounting practices and audit agencies.",
+                  price: "R4,999",
+                  clients: "Unlimited clients",
+                  features: ["Everything in Professional", "Custom Branding / White-label", "Practice-wide Audit Logs", "Unlimited Team Logins", "API Integrations Access", "Dedicated SANAS Advisor Support"],
+                  btnCls: "secondary",
+                  btnText: "Contact Sales"
+                }
+              ].map((p, i) => (
+                <div className={`pricing-card ${p.btnCls === "primary" ? "premium" : ""}`} key={i}>
+                  <div>
+                    <h3 className="price-h3">{p.title}</h3>
+                    <p className="price-desc">{p.desc}</p>
+                    <div className="price-val">
+                      {p.price}<span>/month</span>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--accent)" }}>{p.clients}</div>
+                    
+                    <ul className="price-features">
+                      {p.features.map((f, fi) => (
+                        <li className="price-feature" key={fi}>
+                          <Check size={14} />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <Link to="/auth" className={`btn-price ${p.btnCls}`}>
+                    {p.btnText}
+                  </Link>
                 </div>
-                <p className="sec-p">{s.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -450,11 +485,11 @@ export default function LandingPage() {
           <div className="section-inner">
             <div className="cta-wrap">
               <div className="cta-content">
-                <h2 className="cta-h2 serif">Protect your business <strong>starting today.</strong></h2>
-                <p className="cta-p">Automate your South African compliance obligations. Free for 14 days, no card required.</p>
+                <h2 className="cta-h2 serif">Stop managing B-BBEE <strong>with spreadsheets.</strong></h2>
+                <p className="cta-p">Centralize scorecards, document collections, and compliance audits for all your clients. Get started in minutes.</p>
               </div>
               <Link to="/auth" className="btn-hero" style={{ background: "#fff", color: "var(--ink)", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-                Get Started Now <ArrowUpRight size={18} />
+                Start Practice Trial <ArrowUpRight size={18} />
               </Link>
             </div>
           </div>
@@ -471,21 +506,21 @@ export default function LandingPage() {
                 <span className="logo-text serif">Comply<span>OS</span></span>
               </Link>
               <p className="f-copy">
-                Specialised compliance infrastructure for South African high-growth businesses. A Vylex Technology Group product.
+                B-BBEE compliance software and practice management tools for South African firms. A Vylex Technology Group product.
               </p>
             </div>
             <div>
               <h5 className="f-title">Platform</h5>
               <ul className="f-links">
-                {["Features", "Tax Tracker", "Roadmap", "Pricing"].map(l => (
+                {["Client Portfolio", "Scorecard Engine", "Spend gap tracking", "Evidence Vault"].map(l => (
                   <li key={l}><a href="#" className="f-link">{l}</a></li>
                 ))}
               </ul>
             </div>
             <div>
-              <h5 className="f-title">Company</h5>
+              <h5 className="f-title">Solutions</h5>
               <ul className="f-links">
-                {["About", "Success Stories", "Blog", "Contact"].map(l => (
+                {["Accounting Practices", "BEE Consultants", "SANAS Auditors", "Enterprise Networks"].map(l => (
                   <li key={l}><a href="#" className="f-link">{l}</a></li>
                 ))}
               </ul>
@@ -493,13 +528,13 @@ export default function LandingPage() {
             <div>
               <h5 className="f-title">Legal</h5>
               <ul className="f-links">
-                {["Privacy Policy", "Terms of Service", "Security", "POPIA"].map(l => (
+                {["Privacy Policy", "Terms of Service", "POPIA Compliance", "Contact Support"].map(l => (
                   <li key={l}><a href="#" className="f-link">{l}</a></li>
                 ))}
               </ul>
             </div>
           </div>
-          <div style={{ maxWidth: 1280, margin: "60px auto 0", paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ maxWidth: 1280, margin: "60px auto 0", paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justify: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>© 2026 ComplyOS. Durban, South Africa.</span>
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>
               Powered by{" "}

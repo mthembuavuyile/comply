@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { doc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +56,8 @@ const INITIAL_FORM: FormData = {
 };
 
 export default function OnboardingPage() {
-  const { user, refreshBusiness } = useAuth();
+  const { user } = useAuth();
+  const { refreshClients, setActiveClientId } = useClient();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [sectorSearch, setSectorSearch] = useState("");
@@ -104,32 +106,25 @@ export default function OnboardingPage() {
         ownerId: user.uid,
       };
 
+      let newBizId = "";
       try {
-        await setDoc(doc(db, "businesses", user.uid), businessData);
+        const docRef = await addDoc(collection(db, "businesses"), businessData);
+        newBizId = docRef.id;
       } catch (error) {
-        handleFirestoreError(error, OperationType.WRITE, `businesses/${user.uid}`);
+        handleFirestoreError(error, OperationType.WRITE, "businesses");
+        throw error;
       }
 
-      // 2. Guard against duplicate seeding — check if items already exist
-      const existingQ = query(
-        collection(db, "complianceItems"),
-        where("userId", "==", user.uid)
-      );
-      const existingSnap = await getDocs(existingQ);
-      const existingCategories = new Set(existingSnap.docs.map((d) => d.data().category));
-
-      // 3. Seed compliance items (only those not already present)
+      // 2. Seed compliance items (since it's a new business, we just seed all items)
       const sectorItems = SECTOR_SPECIFIC_ITEMS[formData.sector] || [];
-      const itemsToSeed = [...COMMON_COMPLIANCE_ITEMS, ...sectorItems].filter(
-        (item) => !existingCategories.has(item.category)
-      );
+      const itemsToSeed = [...COMMON_COMPLIANCE_ITEMS, ...sectorItems];
 
       const batch = itemsToSeed.map(async (item) => {
         try {
           return await addDoc(collection(db, "complianceItems"), {
             ...item,
             userId: user.uid,
-            businessId: user.uid,
+            businessId: newBizId,
             status: "pending_setup",
             dueDate: null,
             expiryDate: null,
@@ -146,11 +141,12 @@ export default function OnboardingPage() {
 
       await Promise.all(batch);
 
-      // 4. Mark onboarding as done in session (prevents redirect race condition)
+      // 3. Mark onboarding as done in session (prevents redirect race condition)
       sessionStorage.setItem('vylex_onboarding_done', 'true');
 
-      // 5. Refresh business context and navigate
-      await refreshBusiness();
+      // 4. Update the active client and refresh clients list
+      setActiveClientId(newBizId);
+      refreshClients();
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during onboarding:", error);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { collection, query, where, onSnapshot, addDoc, Timestamp } from "firebase/firestore";
 import { Supplier, SpendLog, EvidenceDoc } from "../types";
@@ -47,7 +48,8 @@ const SUGGESTED_PROMPTS = [
 ];
 
 export default function AIAssistantPage() {
-  const { user, business } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   
   // Chat States
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -108,12 +110,12 @@ export default function AIAssistantPage() {
         });
 
         // B-BBEE System Context
-        const systemInstruction = `You are Vylex Comply's AI B-BBEE Copilot, a leading Broad-Based Black Economic Empowerment strategist in South Africa.
+        const systemInstruction = `You are ComplyOS's AI B-BBEE Copilot, a leading Broad-Based Black Economic Empowerment strategist in South Africa.
 Your objective is to help businesses optimize their BEE scorecard points and levels under the South African B-BBEE Codes of Good Practice.
 Ground rules:
 - Always use South African terms.
 - Be highly detailed about points allocations: Ownership (25 pts), Skills Development (20 pts), Procurement (25 pts), Enterprise & Supplier Development (15 pts), Socio-Economic Development (5 pts).
-- Frame advice within the user's business context: ${business ? `${business.businessName} operating in the ${business.sector} sector.` : "A South African enterprise."}
+- Frame advice within the user's business context: ${activeClient ? `${activeClient.businessName} operating in the ${activeClient.sector} sector.` : "A South African enterprise."}
 - Point out priority elements and sub-minimums (Ownership, Skills Development, and ESD are priority elements. Under-achieving 40% of their targets results in a B-BBEE level drop penalty).
 - Keep formatting clean, using bold points and brief summaries.`;
 
@@ -257,7 +259,7 @@ Return a JSON object conforming exactly to this structure:
 
   // Add OCR extracted data to Firestore dynamically
   const handleOcrAddToSystem = async () => {
-    if (!user || !ocrResult) return;
+    if (!user || !activeClientId || !ocrResult) return;
 
     try {
       if (ocrResult.docType === "BEE Certificate") {
@@ -276,6 +278,7 @@ Return a JSON object conforming exactly to this structure:
 
         await addDoc(collection(db, "suppliers"), {
           userId: user.uid,
+          businessId: activeClientId,
           name: (fields["Supplier Name"] as string) || "New Supplier",
           beeLevel: levelNum,
           blackOwnershipPercent: blackOwnNum,
@@ -293,6 +296,7 @@ Return a JSON object conforming exactly to this structure:
         const amountStr = (String(fields["Amount (ZAR)"] || "0")).replace(/[^\d.]/g, "");
         await addDoc(collection(db, "spendLogs"), {
           userId: user.uid,
+          businessId: activeClientId,
           category: "skills_development",
           description: (fields["Description"] as string) || (fields["Vendor"] ? `Training with ${fields["Vendor"]}` : "Training course"),
           amount: Number(amountStr) || 0,
@@ -306,6 +310,7 @@ Return a JSON object conforming exactly to this structure:
         const amountStr = (String(fields["Amount (ZAR)"] || "0")).replace(/[^\d.]/g, "");
         await addDoc(collection(db, "spendLogs"), {
           userId: user.uid,
+          businessId: activeClientId,
           category: "socio_economic_development",
           description: `Donation to ${fields["Beneficiary NPO"] || "NPO"}`,
           amount: Number(amountStr) || 0,
@@ -322,6 +327,38 @@ Return a JSON object conforming exactly to this structure:
       alert("Failed to integrate OCR data.");
     }
   };
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <Sparkles className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to access the AI B-BBEE Copilot.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

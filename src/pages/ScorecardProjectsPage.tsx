@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { ScorecardProject, Supplier, SpendLog } from "../types";
@@ -34,7 +35,8 @@ const PIPELINE_STAGES = [
 ] as const;
 
 export default function ScorecardProjectsPage() {
-  const { user, business } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   const [projects, setProjects] = useState<ScorecardProject[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [spendLogs, setSpendLogs] = useState<SpendLog[]>([]);
@@ -45,11 +47,11 @@ export default function ScorecardProjectsPage() {
 
   // Fetch projects
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const q = query(
       collection(db, "scorecardProjects"),
-      where("userId", "==", user.uid)
+      where("businessId", "==", activeClientId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -63,21 +65,21 @@ export default function ScorecardProjectsPage() {
     });
 
     return unsubscribe;
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Fetch suppliers & spend logs to calculate live scorecard projection
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const unsubSuppliers = onSnapshot(
-      query(collection(db, "suppliers"), where("userId", "==", user.uid)),
+      query(collection(db, "suppliers"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSuppliers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Supplier[]);
       }
     );
 
     const unsubSpend = onSnapshot(
-      query(collection(db, "spendLogs"), where("userId", "==", user.uid)),
+      query(collection(db, "spendLogs"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSpendLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SpendLog[]);
       }
@@ -87,21 +89,22 @@ export default function ScorecardProjectsPage() {
       unsubSuppliers();
       unsubSpend();
     };
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Live Scorecard calculation
   const liveScorecard = useMemo(() => {
-    return calculateScorecard(business, suppliers, spendLogs);
-  }, [business, suppliers, spendLogs]);
+    return calculateScorecard(activeClient, suppliers, spendLogs);
+  }, [activeClient, suppliers, spendLogs]);
 
   // Handle Create Project
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     // Use current live scorecard projection as starting point for project
     const newProject = {
       userId: user.uid,
+      businessId: activeClientId,
       financialYear,
       status: "data_collection" as const,
       points: {
@@ -186,6 +189,38 @@ export default function ScorecardProjectsPage() {
       console.error("Error deleting project:", error);
     }
   };
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <ClipboardList className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to manage scorecard projects.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { Supplier, SpendLog, Business } from "../types";
@@ -21,7 +22,8 @@ import {
 import { cn } from "../lib/utils";
 
 export default function ScorecardCalculatorPage() {
-  const { user, business } = useAuth();
+  const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [spendLogs, setSpendLogs] = useState<SpendLog[]>([]);
 
@@ -37,25 +39,25 @@ export default function ScorecardCalculatorPage() {
 
   // Initialize sliders from actual values
   useEffect(() => {
-    if (business) {
-      setScenarioOwnership(business.blackOwnershipPercent || 0);
-      setScenarioWomenOwnership(business.blackWomenOwnershipPercent || 0);
+    if (activeClient) {
+      setScenarioOwnership(activeClient.blackOwnershipPercent || 0);
+      setScenarioWomenOwnership(activeClient.blackWomenOwnershipPercent || 0);
     }
-  }, [business, isScenarioMode]);
+  }, [activeClient, isScenarioMode]);
 
   // Fetch actual data
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const unsubSuppliers = onSnapshot(
-      query(collection(db, "suppliers"), where("userId", "==", user.uid)),
+      query(collection(db, "suppliers"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSuppliers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Supplier[]);
       }
     );
 
     const unsubSpend = onSnapshot(
-      query(collection(db, "spendLogs"), where("userId", "==", user.uid)),
+      query(collection(db, "spendLogs"), where("businessId", "==", activeClientId)),
       (snapshot) => {
         setSpendLogs(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SpendLog[]);
       }
@@ -65,12 +67,12 @@ export default function ScorecardCalculatorPage() {
       unsubSuppliers();
       unsubSpend();
     };
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Calculate actual live scorecard
   const actualScorecard = useMemo(() => {
-    return calculateScorecard(business, suppliers, spendLogs);
-  }, [business, suppliers, spendLogs]);
+    return calculateScorecard(activeClient, suppliers, spendLogs);
+  }, [activeClient, suppliers, spendLogs]);
 
   // Calculate what-if scenario scorecard
   const scenarioScorecard = useMemo(() => {
@@ -78,7 +80,7 @@ export default function ScorecardCalculatorPage() {
 
     // 1. Clone & adjust business details
     const simulatedBusiness: Business = {
-      ...(business || {
+      ...(activeClient || {
         id: "",
         businessName: "",
         sector: "general",
@@ -165,7 +167,7 @@ export default function ScorecardCalculatorPage() {
   }, [
     isScenarioMode,
     actualScorecard,
-    business,
+    activeClient,
     suppliers,
     spendLogs,
     scenarioOwnership,
@@ -181,9 +183,9 @@ export default function ScorecardCalculatorPage() {
   const handleExportAuditPack = () => {
     const csvContent = [
       "B-BBEE Scorecard Export Spreadsheet",
-      `Business Name,${business?.businessName || "Vylex Member"}`,
-      `Black Ownership %,${business?.blackOwnershipPercent || 0}%`,
-      `Black Women Ownership %,${business?.blackWomenOwnershipPercent || 0}%`,
+      `Business Name,${activeClient?.businessName || "Vylex Member"}`,
+      `Black Ownership %,${activeClient?.blackOwnershipPercent || 0}%`,
+      `Black Women Ownership %,${activeClient?.blackWomenOwnershipPercent || 0}%`,
       "",
       "Element,Projected Points,Max Points",
       `Ownership,${actualScorecard.points.ownership},25.00`,
@@ -199,7 +201,7 @@ export default function ScorecardCalculatorPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `VylexComply_B-BBEE_Audit_Pack_${business?.businessName || "FY2026"}.zip`;
+    a.download = `ComplyOS_B-BBEE_Audit_Pack_${activeClient?.businessName || "FY2026"}.zip`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -212,9 +214,9 @@ export default function ScorecardCalculatorPage() {
 
   // Reset Sliders
   const handleResetSliders = () => {
-    if (business) {
-      setScenarioOwnership(business.blackOwnershipPercent || 0);
-      setScenarioWomenOwnership(business.blackWomenOwnershipPercent || 0);
+    if (activeClient) {
+      setScenarioOwnership(activeClient.blackOwnershipPercent || 0);
+      setScenarioWomenOwnership(activeClient.blackWomenOwnershipPercent || 0);
     }
     setScenarioAdditionalSkills(0);
     setScenarioAdditionalED(0);
@@ -222,6 +224,38 @@ export default function ScorecardCalculatorPage() {
     setScenarioAdditionalSED(0);
     setScenarioAdditionalL1Spend(0);
   };
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <Sliders className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to run scenario simulations.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

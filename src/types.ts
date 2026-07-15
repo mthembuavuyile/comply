@@ -39,6 +39,9 @@ export type VatStatus = 'yes' | 'no' | 'not_sure';
 
 export type EmployeeBand = '0' | '1-5' | '6-20' | '21-50' | '51+';
 
+// --- Multi-Client Access Model ---
+export type UserRole = 'owner' | 'accountant' | 'auditor' | 'viewer';
+
 export interface Business {
   id: string;
   businessName: string;
@@ -54,12 +57,19 @@ export interface Business {
   ownerId: string;
   // Legacy field — kept for backward compat, no longer written
   employeeCount?: number;
-  
+
   // B-BBEE Fields
   blackOwnershipPercent?: number;
   blackWomenOwnershipPercent?: number;
   annualPayroll?: number;
   npat?: number; // Net Profit After Tax
+
+  // Multi-client / Practice fields
+  contactEmail?: string;
+  contactPhone?: string;
+  registrationNumber?: string;   // CIPC registration number
+  vatNumber?: string;            // SARS VAT number
+  financialYearEnd?: number;     // Month (1-12) of financial year end
 }
 
 export type ComplianceGroup =
@@ -121,6 +131,7 @@ export interface ComplianceItem {
 export interface Alert {
   id: string;
   userId: string;
+  businessId: string;
   complianceItemId: string;
   type: 'due_soon' | 'overdue' | 'expiring';
   message: string;
@@ -133,6 +144,7 @@ export interface Alert {
 export interface Supplier {
   id: string;
   userId: string;
+  businessId: string;
   name: string;
   beeLevel: number; // 1 to 8, or 9 for non-compliant
   blackOwnershipPercent: number;
@@ -148,6 +160,7 @@ export interface Supplier {
 export interface SpendLog {
   id: string;
   userId: string;
+  businessId: string;
   category: 'skills_development' | 'enterprise_development' | 'supplier_development' | 'socio_economic_development';
   description: string;
   amount: number;
@@ -159,6 +172,7 @@ export interface SpendLog {
 export interface EvidenceDoc {
   id: string;
   userId: string;
+  businessId: string;
   name: string;
   element: 'ownership' | 'skills' | 'procurement' | 'esd' | 'sed';
   url: string;
@@ -173,6 +187,7 @@ export interface EvidenceDoc {
 export interface ScorecardProject {
   id: string;
   userId: string;
+  businessId: string;
   financialYear: string; // e.g. "2026"
   status: 'data_collection' | 'supplier_verification' | 'evidence_upload' | 'internal_review' | 'auditor_ready' | 'certified';
   points: {

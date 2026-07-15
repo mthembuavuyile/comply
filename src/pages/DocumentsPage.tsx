@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../App";
+import { useClient } from "../lib/clientContext";
 import { db, handleFirestoreError, OperationType, storage } from "../lib/firebase";
 import { collection, query, where, onSnapshot, addDoc, doc, updateDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -46,6 +47,7 @@ const ELEMENT_FOLDERS = [
 
 export default function DocumentsPage() {
   const { user } = useAuth();
+  const { activeClient, activeClientId, clientsLoading } = useClient();
   const [documents, setDocuments] = useState<EvidenceDoc[]>([]);
   const [selectedElement, setSelectedElement] = useState<EvidenceDoc["element"] | "all">("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -67,11 +69,11 @@ export default function DocumentsPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     const q = query(
       collection(db, "evidenceVault"),
-      where("userId", "==", user.uid)
+      where("businessId", "==", activeClientId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -86,7 +88,7 @@ export default function DocumentsPage() {
     });
 
     return unsubscribe;
-  }, [user]);
+  }, [user, activeClientId]);
 
   // Count docs in each element for folder badges
   const elementCounts = useMemo(() => {
@@ -277,7 +279,7 @@ Generate the report in clean Markdown format with bold highlights.`;
 
   const handleSaveDoc = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !activeClientId) return;
 
     setIsUploading(true);
     let finalUrl = docUrl;
@@ -285,13 +287,14 @@ Generate the report in clean Markdown format with bold highlights.`;
     try {
       if (selectedFile) {
         // Upload selected file to Firebase Storage
-        const fileRef = ref(storage, `documents/${user.uid}/${Date.now()}_${selectedFile.name}`);
+        const fileRef = ref(storage, `documents/${activeClientId}/${Date.now()}_${selectedFile.name}`);
         const uploadResult = await uploadBytes(fileRef, selectedFile);
         finalUrl = await getDownloadURL(uploadResult.ref);
       }
 
       const data = {
         userId: user.uid,
+        businessId: activeClientId,
         name: docName || (selectedFile ? selectedFile.name : "Unnamed Document"),
         element: docElement,
         url: finalUrl || "https://firebasestorage.googleapis.com/v0/b/comply-b3bfe.firebasestorage.app/o/dummy_evidence.pdf",
@@ -341,6 +344,38 @@ Generate the report in clean Markdown format with bold highlights.`;
         return <span className="bg-sky-50 text-sky-700 border border-sky-200 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1"><Clock className="h-3 w-3" /> Pending Review</span>;
     }
   };
+
+  if (clientsLoading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!activeClient) {
+    return (
+      <Layout>
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+            <FolderOpen className="h-8 w-8 text-sky-400" />
+          </div>
+          <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
+          <p className="text-gray-500 font-medium text-sm mb-6">
+            Please select a client business from the portfolio or create a new client to view evidence documents.
+          </p>
+          <a
+            href="/clients"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          >
+            Go to Clients Portfolio
+          </a>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

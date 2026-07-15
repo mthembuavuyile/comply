@@ -25,6 +25,12 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == request.resource.data.userId;
     }
 
+    // Checks if the user is the owner of the business with the given businessId
+    function ownsBusiness(businessId) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid;
+    }
+
     // --- Size Helpers ---
     // Prevent billing abuse by enforcing maximum string lengths
     function isShortString(val, maxLen) {
@@ -97,23 +103,23 @@ service cloud.firestore {
              && (!('customSectorText' in data.keys()) || isShortString(data.customSectorText, 200));
     }
 
-    match /businesses/{userId} {
+    match /businesses/{businessId} {
       // Only the owner can read their own business document
-      allow read: if isOwner(userId);
+      allow read: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
 
-      // Create: only for your own UID, must pass full validation
-      allow create: if isOwner(userId) && isValidBusinessData(request.resource.data);
+      // Create: owner must match auth.uid, must pass full validation
+      allow create: if isAuthenticated() && isValidBusinessData(request.resource.data);
 
       // Update: must still pass validation + cannot change ownerId
-      allow update: if isOwner(userId)
+      allow update: if isAuthenticated()
+                    && resource.data.ownerId == request.auth.uid
+                    && request.resource.data.ownerId == request.auth.uid
                     && isValidBusinessData(request.resource.data)
-                    // Prevent ownership transfer
-                    && request.resource.data.ownerId == resource.data.ownerId
                     // Prevent removing the onboarding flag once set
                     && (resource.data.onboardingCompleted == false || request.resource.data.onboardingCompleted == true);
 
       // Delete: owner only (e.g. account deletion)
-      allow delete: if isOwner(userId);
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
     }
 
     // ===============================================================
@@ -130,7 +136,7 @@ service cloud.firestore {
              ])
              // --- Ownership ---
              && data.userId == request.auth.uid
-             && data.businessId == request.auth.uid
+             && ownsBusiness(data.businessId)
              // --- Required Strings ---
              && isShortString(data.title, 200)
              && data.title.size() > 0
@@ -146,27 +152,23 @@ service cloud.firestore {
     }
 
     match /complianceItems/{itemId} {
-      // Read: ONLY documents you own (must have userId filter in query)
-      // FIXED: Removed the old permissive rule that let any authenticated user
-      // read any compliance item with limit <= 100 (was a data leak!)
-      allow read: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
 
-      // Create: validated, owner check, max items guard
-      allow create: if isRequestOwner()
+      allow create: if isAuthenticated() 
+                    && request.resource.data.userId == request.auth.uid
+                    && ownsBusiness(request.resource.data.businessId)
                     && isValidComplianceItemData(request.resource.data);
 
-      // Update: must be doc owner, data still valid, cannot change userId/businessId
-      allow update: if isDocOwner()
-                    && isRequestOwner()
+      allow update: if isAuthenticated()
+                    && ownsBusiness(resource.data.businessId)
+                    && ownsBusiness(request.resource.data.businessId)
+                    && request.resource.data.userId == request.auth.uid
                     && isValidComplianceItemData(request.resource.data)
-                    // Prevent reassigning item to another user
                     && request.resource.data.userId == resource.data.userId
                     && request.resource.data.businessId == resource.data.businessId
-                    // Don't allow changing the category (prevents duplication bugs)
                     && request.resource.data.category == resource.data.category;
 
-      // Delete: only item owner
-      allow delete: if isDocOwner();
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
@@ -179,9 +181,10 @@ service cloud.firestore {
 
     function isValidAlertData(data) {
       return data.keys().hasAll([
-               'userId', 'complianceItemId', 'type', 'message', 'read'
+               'userId', 'businessId', 'complianceItemId', 'type', 'message', 'read'
              ])
              && data.userId == request.auth.uid
+             && ownsBusiness(data.businessId)
              // --- String fields ---
              && isShortString(data.complianceItemId, 128)
              && isValidAlertType(data.type)
@@ -191,65 +194,72 @@ service cloud.firestore {
     }
 
     match /alerts/{alertId} {
-      // Read: ONLY your own alerts
-      // FIXED: Removed old permissive rule (same data leak as complianceItems)
-      allow read: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
 
-      // Create: user can create alerts for themselves
-      allow create: if isRequestOwner()
-                    && isValidAlertData(request.resource.data);
+      allow create: if isAuthenticated() && ownsBusiness(request.resource.data.businessId) && isValidAlertData(request.resource.data);
 
-      // Update: owner only, must stay valid, cannot reassign userId
-      // Only specific mutations allowed: marking as read
-      allow update: if isDocOwner()
-                    && isRequestOwner()
+      allow update: if isAuthenticated() 
+                    && ownsBusiness(resource.data.businessId)
+                    && ownsBusiness(request.resource.data.businessId)
+                    && request.resource.data.userId == request.auth.uid
                     && isValidAlertData(request.resource.data)
                     && request.resource.data.userId == resource.data.userId
                     // Only allow flipping read to true, not back to false
                     && (resource.data.read == true || request.resource.data.read == true);
 
-      // Delete: alert owner only
-      allow delete: if isDocOwner();
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
     // B-BBEE: SUPPLIERS — /suppliers/{supplierId}
     // ===============================================================
     match /suppliers/{supplierId} {
-      allow read: if isDocOwner();
-      allow create: if isRequestOwner();
-      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
-      allow delete: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
+      allow create: if isAuthenticated() && ownsBusiness(request.resource.data.businessId);
+      allow update: if isAuthenticated() 
+                    && ownsBusiness(resource.data.businessId) 
+                    && ownsBusiness(request.resource.data.businessId) 
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
     // B-BBEE: SPEND LOGS — /spendLogs/{logId}
     // ===============================================================
     match /spendLogs/{logId} {
-      allow read: if isDocOwner();
-      allow create: if isRequestOwner();
-      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
-      allow delete: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
+      allow create: if isAuthenticated() && ownsBusiness(request.resource.data.businessId);
+      allow update: if isAuthenticated() 
+                    && ownsBusiness(resource.data.businessId) 
+                    && ownsBusiness(request.resource.data.businessId) 
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
     // B-BBEE: EVIDENCE VAULT — /evidenceVault/{docId}
     // ===============================================================
     match /evidenceVault/{docId} {
-      allow read: if isDocOwner();
-      allow create: if isRequestOwner();
-      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
-      allow delete: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
+      allow create: if isAuthenticated() && ownsBusiness(request.resource.data.businessId);
+      allow update: if isAuthenticated() 
+                    && ownsBusiness(resource.data.businessId) 
+                    && ownsBusiness(request.resource.data.businessId) 
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
     // B-BBEE: SCORECARD PROJECTS — /scorecardProjects/{projectId}
     // ===============================================================
     match /scorecardProjects/{projectId} {
-      allow read: if isDocOwner();
-      allow create: if isRequestOwner();
-      allow update: if isDocOwner() && isRequestOwner() && request.resource.data.userId == resource.data.userId;
-      allow delete: if isDocOwner();
+      allow read: if isAuthenticated() && ownsBusiness(resource.data.businessId);
+      allow create: if isAuthenticated() && ownsBusiness(request.resource.data.businessId);
+      allow update: if isAuthenticated() 
+                    && ownsBusiness(resource.data.businessId) 
+                    && ownsBusiness(request.resource.data.businessId) 
+                    && request.resource.data.userId == resource.data.userId;
+      allow delete: if isAuthenticated() && ownsBusiness(resource.data.businessId);
     }
 
     // ===============================================================
