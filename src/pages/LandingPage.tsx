@@ -264,10 +264,7 @@ export default function LandingPage() {
               {user ? (
                 <Link to="/dashboard" className="btn-primary">Dashboard</Link>
               ) : (
-                <>
-                  <Link to="/auth" className="btn-ghost">Log in</Link>
-                  <Link to="/auth" className="btn-primary">Get started</Link>
-                </>
+                <Link to="/auth" className="btn-primary">Get started</Link>
               )}
             </div>
           </div>
@@ -280,11 +277,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "circOut" }}
           >
-            <div className="hero-badge">
-              <span className="hero-badge-dot" />
-              Built for South African businesses
-            </div>
-            <h1 className="hero-h1 serif">
+            <h1 className="hero-h1">
               Compliance is now <strong>simply managed.</strong>
             </h1>
             <p className="hero-sub">
