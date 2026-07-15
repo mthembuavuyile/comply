@@ -41,7 +41,8 @@ export default function Layout({ children }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClientSwitcherOpen, setIsClientSwitcherOpen] = useState(false);
   const [clientSearch, setClientSearch] = useState("");
-  const switcherRef = useRef<HTMLDivElement>(null);
+  const desktopSwitcherRef = useRef<HTMLDivElement>(null);
+  const mobileSwitcherRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -51,7 +52,12 @@ export default function Layout({ children }: LayoutProps) {
   // Close client switcher when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (switcherRef.current && !switcherRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isOutsideDesktop = desktopSwitcherRef.current && !desktopSwitcherRef.current.contains(target);
+      const isOutsideMobile = mobileSwitcherRef.current && !mobileSwitcherRef.current.contains(target);
+      
+      // Only close if the click is outside BOTH switchers
+      if ((!desktopSwitcherRef.current || isOutsideDesktop) && (!mobileSwitcherRef.current || isOutsideMobile)) {
         setIsClientSwitcherOpen(false);
         setClientSearch("");
       }
@@ -115,8 +121,8 @@ export default function Layout({ children }: LayoutProps) {
   );
 
   // Client Switcher Widget
-  const ClientSwitcher = ({ onClientSwitch }: { onClientSwitch?: () => void }) => (
-    <div className="relative" ref={switcherRef}>
+  const ClientSwitcher = ({ onClientSwitch, containerRef }: { onClientSwitch?: () => void, containerRef: React.RefObject<HTMLDivElement> }) => (
+    <div className="relative" ref={containerRef}>
       <button
         onClick={() => {
           setIsClientSwitcherOpen(!isClientSwitcherOpen);
@@ -256,7 +262,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="p-6 flex-1 overflow-y-auto">
           {/* Client Switcher */}
           <div className="mb-6">
-            <ClientSwitcher />
+            {ClientSwitcher({ containerRef: desktopSwitcherRef })}
           </div>
 
           {/* B-BBEE Section */}
@@ -331,7 +337,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="p-6 overflow-y-auto flex-1">
           {/* Client Switcher (mobile) */}
           <div className="mb-6">
-            <ClientSwitcher onClientSwitch={() => setIsMobileMenuOpen(false)} />
+            {ClientSwitcher({ onClientSwitch: () => setIsMobileMenuOpen(false), containerRef: mobileSwitcherRef })}
           </div>
 
           <nav className="space-y-1">

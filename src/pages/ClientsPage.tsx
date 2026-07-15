@@ -5,6 +5,8 @@ import Layout from "../components/Layout";
 import { getSectorLabel } from "../constants";
 import { Business } from "../types";
 import { useNavigate } from "react-router-dom";
+import { db } from "../lib/firebase";
+import { doc, deleteDoc } from "firebase/firestore";
 import {
   Building2,
   Search,
@@ -18,6 +20,7 @@ import {
   LayoutGrid,
   MapPin,
   Shield,
+  Trash2,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -76,6 +79,20 @@ export default function ClientsPage() {
 
   const handleAddClient = () => {
     navigate("/onboarding");
+  };
+
+  const handleDeleteClient = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation(); // prevent card click
+    if (!window.confirm(`Are you sure you want to delete the client "${name}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteDoc(doc(db, "businesses", id));
+      // active client will be handled automatically by ClientContext if the active one is deleted
+    } catch (error) {
+      console.error("Failed to delete client", error);
+      alert("Failed to delete client. Please try again.");
+    }
   };
 
   return (
@@ -240,7 +257,16 @@ export default function ClientsPage() {
                         </p>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-sky-500 flex-shrink-0 mt-1 transition-colors" />
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => handleDeleteClient(e, client.id, client.businessName)}
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                        title="Delete Client"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-sky-500 flex-shrink-0 transition-colors" />
+                    </div>
                   </div>
 
                   {/* Details */}
