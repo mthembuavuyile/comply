@@ -14,7 +14,6 @@ import {
   Zap,
   HelpCircle,
   PlusCircle,
-  Sparkles,
   ArrowRight,
   RefreshCw,
   Info,
@@ -238,8 +237,8 @@ export default function ScorecardCalculatorPage() {
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <Sliders className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -248,7 +247,7 @@ export default function ScorecardCalculatorPage() {
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -270,7 +269,7 @@ export default function ScorecardCalculatorPage() {
           </div>
           <button
             onClick={handleExportAuditPack}
-            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 hover:scale-[1.02] active:scale-95 transition-all font-bold text-sm"
+            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-lg shadow-lg  hover:bg-sky-700 hover:scale-[1.02]  transition-all font-bold text-sm"
           >
             <Download className="h-4 w-4" />
             <span>Export Audit Pack ZIP</span>
@@ -280,7 +279,7 @@ export default function ScorecardCalculatorPage() {
         {/* Global Level Projections */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Actual Score Card */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 flex flex-col justify-between h-44">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between h-44">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Current B-BBEE Level</span>
               <h3 className="text-4xl font-black text-gray-900 mt-2">
@@ -291,7 +290,7 @@ export default function ScorecardCalculatorPage() {
           </div>
 
           {/* Actual Points Card */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 flex flex-col justify-between h-44">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between h-44">
             <div>
               <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">Projected Points Total</span>
               <h3 className="text-4xl font-black text-sky-600 mt-2">
@@ -303,15 +302,15 @@ export default function ScorecardCalculatorPage() {
 
           {/* Scenario Comparison Card */}
           <div className={cn(
-            "p-6 rounded-3xl border shadow-xl shadow-gray-200/30 flex flex-col justify-between h-44 transition-all duration-500",
+            "p-6 rounded-xl border shadow-md  flex flex-col justify-between h-44 transition-all duration-500",
             isScenarioMode
-              ? "bg-gradient-to-br from-indigo-950 to-slate-900 text-white border-indigo-950"
+              ? " bg-indigo-950  text-white border-indigo-950"
               : "bg-gray-50 border-gray-100 text-gray-400"
           )}>
             {isScenarioMode ? (
               <>
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> What-If Level Projection</span>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-indigo-300 flex items-center gap-1.5"> What-If Level Projection</span>
                   <h3 className="text-4xl font-black text-white mt-2">
                     {scenarioScorecard.projectedLevel === 9 ? "Non-Compliant" : `Level ${scenarioScorecard.projectedLevel}`}
                   </h3>
@@ -331,7 +330,7 @@ export default function ScorecardCalculatorPage() {
               </>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-center space-y-2">
-                <Sliders className="h-8 w-8 text-gray-300 animate-pulse" />
+                <Sliders className="h-8 w-8 text-gray-300 " />
                 <span className="text-xs font-bold">Activate Scenario Modeling Mode to project changes</span>
               </div>
             )}
@@ -341,7 +340,7 @@ export default function ScorecardCalculatorPage() {
         {/* Spreadsheet View & Sliders */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Detailed Scorecard Sheet */}
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 overflow-hidden">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-md  overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center space-x-2 text-gray-900">
                 <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
@@ -432,7 +431,7 @@ export default function ScorecardCalculatorPage() {
 
           {/* Scenario Modeler Sidebar */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-900 shadow-xl shadow-indigo-950/20 text-white relative overflow-hidden flex flex-col justify-between min-h-[500px]">
+            <div className=" bg-indigo-950  p-6 rounded-xl border border-indigo-900 shadow-md  text-white relative overflow-hidden flex flex-col justify-between min-h-[500px]">
               <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
                 <Sliders className="h-48 w-48" />
               </div>
@@ -462,7 +461,7 @@ export default function ScorecardCalculatorPage() {
 
                 {!isScenarioMode ? (
                   <div className="py-20 text-center space-y-4">
-                    <Sliders className="h-10 w-10 mx-auto text-indigo-400 animate-pulse" />
+                    <Sliders className="h-10 w-10 mx-auto text-indigo-400 " />
                     <h5 className="font-bold text-lg">Scenario Modeling Offline</h5>
                     <p className="text-xs text-indigo-200/60 max-w-xs mx-auto leading-relaxed">
                       Toggle the simulator to model "What-If" scenarios, like increasing Black ownership or injecting training budgets, to see point updates instantly.

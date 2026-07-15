@@ -18,7 +18,6 @@ import {
   AlertTriangle,
   Clock,
   X,
-  Sparkles,
   ExternalLink,
   ChevronRight,
   Brain,
@@ -38,11 +37,11 @@ function getAIInstance() {
 }
 
 const ELEMENT_FOLDERS = [
-  { value: "ownership", label: "Ownership", color: "from-blue-500 to-indigo-600", bg: "bg-blue-50", text: "text-blue-700", desc: "Share certificates, ID docs, CIPC records" },
-  { value: "skills", label: "Skills Development", color: "from-emerald-500 to-teal-600", bg: "bg-emerald-50", text: "text-emerald-700", desc: "Payroll lists, training invoices, agreements" },
-  { value: "procurement", label: "Procurement", color: "from-amber-500 to-orange-600", bg: "bg-amber-50", text: "text-amber-700", desc: "Supplier certificates, scorecards, spend records" },
-  { value: "esd", label: "ESD (Enterprise & Supplier Dev)", color: "from-purple-500 to-pink-600", bg: "bg-purple-50", text: "text-purple-700", desc: "Development agreements, payment proofs, grants" },
-  { value: "sed", label: "SED (Socio-Economic Dev)", color: "from-rose-500 to-red-600", bg: "bg-rose-50", text: "text-rose-700", desc: "Donation receipts, Section 18A, NPO certificates" },
+  { value: "ownership", label: "Ownership", color: "bg-blue-500 ", bg: "bg-blue-50", text: "text-blue-700", desc: "Share certificates, ID docs, CIPC records" },
+  { value: "skills", label: "Skills Development", color: "bg-emerald-500 ", bg: "bg-emerald-50", text: "text-emerald-700", desc: "Payroll lists, training invoices, agreements" },
+  { value: "procurement", label: "Procurement", color: "bg-amber-500 ", bg: "bg-amber-50", text: "text-amber-700", desc: "Supplier certificates, scorecards, spend records" },
+  { value: "esd", label: "ESD (Enterprise & Supplier Dev)", color: "bg-purple-500 ", bg: "bg-purple-50", text: "text-purple-700", desc: "Development agreements, payment proofs, grants" },
+  { value: "sed", label: "SED (Socio-Economic Dev)", color: "bg-rose-500 ", bg: "bg-rose-50", text: "text-rose-700", desc: "Donation receipts, Section 18A, NPO certificates" },
 ] as const;
 
 export default function DocumentsPage() {
@@ -358,8 +357,8 @@ Generate the report in clean Markdown format with bold highlights.`;
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <FolderOpen className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -368,7 +367,7 @@ Generate the report in clean Markdown format with bold highlights.`;
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -388,7 +387,7 @@ Generate the report in clean Markdown format with bold highlights.`;
           </div>
           <button
             onClick={handleOpenUploadModal}
-            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 hover:scale-[1.02] active:scale-95 transition-all font-bold text-sm"
+            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-lg shadow-lg  hover:bg-sky-700 hover:scale-[1.02]  transition-all font-bold text-sm"
           >
             <Upload className="h-4 w-4" />
             <span>Upload Document</span>
@@ -410,15 +409,15 @@ Generate the report in clean Markdown format with bold highlights.`;
                   backgroundColor: !isSelected ? "white" : undefined,
                 }}
                 className={cn(
-                  "p-5 rounded-3xl border text-left transition-all duration-300 relative group flex flex-col justify-between h-36 shadow-sm overflow-hidden",
+                  "p-5 rounded-xl border text-left transition-all duration-300 relative group flex flex-col justify-between h-36 shadow-sm overflow-hidden",
                   isSelected
-                    ? `bg-gradient-to-br ${folder.color} text-white border-transparent scale-[1.02] shadow-lg`
+                    ? ` ${folder.color} text-white border-transparent scale-[1.02] shadow-lg`
                     : "bg-white border-gray-100 hover:border-gray-200 hover:scale-[1.01]"
                 )}
               >
                 <div className="flex items-start justify-between w-full">
                   <div className={cn(
-                    "p-3 rounded-2xl transition-colors",
+                    "p-3 rounded-lg transition-colors",
                     isSelected ? "bg-white/10" : folder.bg
                   )}>
                     {isSelected ? (
@@ -453,7 +452,7 @@ Generate the report in clean Markdown format with bold highlights.`;
           {/* Documents List */}
           <div className="lg:col-span-2 space-y-6">
             {/* Filters */}
-            <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-4">
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -461,7 +460,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                   placeholder="Search files..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
                 />
               </div>
               <div className="relative flex items-center space-x-2">
@@ -469,7 +468,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                 <select
                   value={filterTag}
                   onChange={(e) => setFilterTag(e.target.value)}
-                  className="bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                  className="bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
                 >
                   <option value="all">All Verification Statuses</option>
                   <option value="valid_for_audit">Valid for Audit</option>
@@ -483,7 +482,7 @@ Generate the report in clean Markdown format with bold highlights.`;
             {/* Document Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredDocs.length === 0 ? (
-                <div className="col-span-full py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center">
+                <div className="col-span-full py-20 bg-white rounded-xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center">
                   <FileText className="h-12 w-12 text-gray-200 mb-4" />
                   <h3 className="text-lg font-bold text-gray-900">No documents found</h3>
                   <p className="text-gray-400 text-xs mt-1 max-w-xs">
@@ -505,9 +504,9 @@ Generate the report in clean Markdown format with bold highlights.`;
                         setAiReport(docItem.aiReview?.notes || null);
                       }}
                       className={cn(
-                        "bg-white p-5 rounded-3xl border cursor-pointer transition-all flex flex-col justify-between group shadow-sm hover:scale-[1.01]",
+                        "bg-white p-5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between group shadow-sm hover:scale-[1.01]",
                         isSelected
-                          ? "border-sky-500 shadow-md shadow-sky-100"
+                          ? "border-sky-500 shadow-md "
                           : "border-gray-100 hover:border-gray-200 hover:shadow-md"
                       )}
                     >
@@ -561,7 +560,7 @@ Generate the report in clean Markdown format with bold highlights.`;
 
           {/* AI Checker Panel */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-900 shadow-xl shadow-indigo-950/20 text-white h-full min-h-[500px] flex flex-col justify-between relative overflow-hidden">
+            <div className=" bg-indigo-950  p-6 rounded-xl border border-indigo-900 shadow-md  text-white h-full min-h-[500px] flex flex-col justify-between relative overflow-hidden">
               <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
                 <Brain className="h-48 w-48" />
               </div>
@@ -569,7 +568,7 @@ Generate the report in clean Markdown format with bold highlights.`;
               <div>
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                   <div className="flex items-center space-x-2 text-indigo-400">
-                    <Sparkles className="h-5 w-5" />
+                    
                     <span className="text-xs font-black uppercase tracking-widest">AI Document Checker</span>
                   </div>
                   <span className="text-[9px] bg-indigo-500/30 text-indigo-200 border border-indigo-500/40 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
@@ -579,7 +578,7 @@ Generate the report in clean Markdown format with bold highlights.`;
 
                 {!selectedDoc ? (
                   <div className="py-20 text-center space-y-4">
-                    <Brain className="h-12 w-12 mx-auto text-indigo-400 animate-pulse" />
+                    <Brain className="h-12 w-12 mx-auto text-indigo-400 " />
                     <h5 className="font-bold text-lg text-white">Select a Document</h5>
                     <p className="text-xs text-indigo-200/60 max-w-xs mx-auto leading-relaxed">
                       Select any document in your vault to verify completeness, check formatting errors, and audit risk.
@@ -600,11 +599,11 @@ Generate the report in clean Markdown format with bold highlights.`;
                         <p className="text-xs font-bold text-indigo-200">Checking document signatures, dates, and SANAS requirements...</p>
                       </div>
                     ) : aiReport ? (
-                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl text-xs font-medium text-indigo-100 leading-relaxed overflow-y-auto max-h-[350px] whitespace-pre-wrap select-text scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-lg text-xs font-medium text-indigo-100 leading-relaxed overflow-y-auto max-h-[350px] whitespace-pre-wrap select-text scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                         {aiReport}
                       </div>
                     ) : (
-                      <div className="py-10 text-center space-y-4 bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <div className="py-10 text-center space-y-4 bg-white/5 border border-white/10 rounded-lg p-4">
                         <FileCheck className="h-8 w-8 mx-auto text-indigo-400" />
                         <p className="text-xs text-indigo-200/80">This document has not been audited by the AI system yet.</p>
                       </div>
@@ -617,9 +616,9 @@ Generate the report in clean Markdown format with bold highlights.`;
                 <div className="pt-6 mt-6 border-t border-white/10">
                   <button
                     onClick={() => runAiAnalysis(selectedDoc)}
-                    className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-2xl shadow-lg shadow-indigo-950 transition-all hover:scale-[1.01]"
+                    className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-lg  transition-all hover:scale-[1.01]"
                   >
-                    <Sparkles className="h-4 w-4" />
+                    
                     <span>{aiReport ? "Re-Run Audit Check" : "Run AI Audit Checker"}</span>
                   </button>
                 </div>
@@ -630,8 +629,8 @@ Generate the report in clean Markdown format with bold highlights.`;
 
         {/* Upload Modal */}
         {isUploadModalOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-6 shadow-2xl relative">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 shadow-lg relative">
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h3 className="text-xl font-black text-gray-900">Upload Evidence Document</h3>
                 <button
@@ -646,7 +645,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                 {/* File Upload Selector */}
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase text-gray-400 tracking-wider">Select Evidence File (PDF or Image)</label>
-                  <div className="relative border border-dashed border-gray-200 hover:border-sky-300 rounded-2xl p-6 text-center transition-all bg-gray-50/50 group cursor-pointer">
+                  <div className="relative border border-dashed border-gray-200 hover:border-sky-300 rounded-lg p-6 text-center transition-all bg-gray-50/50 group cursor-pointer">
                     <input
                       type="file"
                       accept="application/pdf,image/*"
@@ -685,7 +684,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                     value={docName}
                     onChange={(e) => setDocName(e.target.value)}
                     disabled={isUploading}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="e.g. CIPC Shareholder Registry.pdf"
                   />
                 </div>
@@ -697,7 +696,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                       value={docElement}
                       onChange={(e) => setDocElement(e.target.value as any)}
                       disabled={isUploading}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                     >
                       <option value="ownership">Ownership</option>
                       <option value="skills">Skills Development</option>
@@ -713,7 +712,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                       value={docTag}
                       onChange={(e) => setDocTag(e.target.value as any)}
                       disabled={isUploading}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                     >
                       <option value="pending_verification">Pending Review</option>
                       <option value="valid_for_audit">Valid for Audit</option>
@@ -730,7 +729,7 @@ Generate the report in clean Markdown format with bold highlights.`;
                     value={docUrl}
                     onChange={(e) => setDocUrl(e.target.value)}
                     disabled={isUploading}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="https://..."
                   />
                 </div>
@@ -740,14 +739,14 @@ Generate the report in clean Markdown format with bold highlights.`;
                     type="button"
                     onClick={() => setIsUploadModalOpen(false)}
                     disabled={isUploading}
-                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-200 transition-colors text-sm disabled:opacity-50"
+                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isUploading}
-                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-2xl hover:bg-sky-700 shadow-md shadow-sky-200 transition-colors text-sm disabled:bg-sky-400 flex items-center justify-center gap-2"
+                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-lg hover:bg-sky-700 shadow-md  transition-colors text-sm disabled:bg-sky-400 flex items-center justify-center gap-2"
                   >
                     {isUploading ? (
                       <>

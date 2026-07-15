@@ -159,17 +159,17 @@ export default function OnboardingPage() {
   const stepLabels = ["Business Identity", "Compliance Triggers", "Review & Confirm"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-sky-50/30 to-slate-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen  bg-slate-50 via-sky-50/30  flex flex-col items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <div className="bg-sky-600 p-2.5 rounded-xl shadow-lg shadow-sky-200/50 mr-3">
+          <div className="bg-sky-600 p-2.5 rounded-xl shadow-lg  mr-3">
             <Briefcase className="h-6 w-6 text-white" />
           </div>
           <span className="text-xl font-bold text-gray-900 tracking-tight">Vylex Comply</span>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md  border border-gray-100 overflow-hidden">
           {/* Progress Bar */}
           <div className="px-8 pt-8 pb-0">
             <div className="flex items-center justify-between mb-2">
@@ -179,9 +179,9 @@ export default function OnboardingPage() {
                     className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300",
                       step > s
-                        ? "bg-green-500 text-white shadow-lg shadow-green-200"
+                        ? "bg-green-500 text-white shadow-lg "
                         : step === s
-                        ? "bg-sky-500 text-white shadow-lg shadow-sky-200"
+                        ? "bg-sky-500 text-white shadow-lg "
                         : "bg-gray-100 text-gray-400"
                     )}
                   >
@@ -216,7 +216,7 @@ export default function OnboardingPage() {
           <div className="px-8 pb-8">
             {/* =================== STEP 1 =================== */}
             {step === 1 && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-400 space-y-6">
+              <div className="animate-in fade-in slide-in-bg-right-4 duration-400 space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">Tell us about your business</h2>
                   <p className="text-gray-500 text-sm">We'll use this to build your custom compliance roadmap.</p>
@@ -334,7 +334,7 @@ export default function OnboardingPage() {
 
             {/* =================== STEP 2 =================== */}
             {step === 2 && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-400 space-y-6">
+              <div className="animate-in fade-in slide-in-bg-right-4 duration-400 space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">Compliance triggers</h2>
                   <p className="text-gray-500 text-sm">Almost there! These help us determine your tax and labor obligations.</p>
@@ -410,7 +410,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* CIPC Registered */}
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100">
                   <div>
                     <h3 className="font-semibold text-gray-900 text-sm">CIPC Registered?</h3>
                     <p className="text-xs text-gray-500">Is your company registered with CIPC?</p>
@@ -435,9 +435,9 @@ export default function OnboardingPage() {
 
             {/* =================== STEP 3 =================== */}
             {step === 3 && (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-400 space-y-6">
+              <div className="animate-in fade-in slide-in-bg-right-4 duration-400 space-y-6">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <FileCheck className="w-8 h-8 text-sky-600" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">Here's your compliance profile</h2>
@@ -447,7 +447,7 @@ export default function OnboardingPage() {
                 {/* Summary Card */}
                 <div className="space-y-4">
                   {/* Business Identity Section */}
-                  <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
+                  <div className="bg-gray-50 rounded-lg border border-gray-100 p-5">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest">Business Identity</h4>
                       <button onClick={() => setStep(1)} className="flex items-center text-sky-600 text-xs font-bold hover:text-sky-700 transition-colors">
@@ -462,7 +462,7 @@ export default function OnboardingPage() {
                   </div>
 
                   {/* Compliance Triggers Section */}
-                  <div className="bg-gray-50 rounded-2xl border border-gray-100 p-5">
+                  <div className="bg-gray-50 rounded-lg border border-gray-100 p-5">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="text-xs font-black text-gray-900 uppercase tracking-widest">Compliance Triggers</h4>
                       <button onClick={() => setStep(2)} className="flex items-center text-sky-600 text-xs font-bold hover:text-sky-700 transition-colors">
@@ -478,7 +478,7 @@ export default function OnboardingPage() {
                   </div>
 
                   {/* Items Preview */}
-                  <div className="bg-sky-50 rounded-2xl border border-sky-100 p-5">
+                  <div className="bg-sky-50 rounded-lg border border-sky-100 p-5">
                     <h4 className="text-xs font-black text-sky-900 uppercase tracking-widest mb-3">
                       Your Compliance Roadmap Will Include:
                     </h4>
@@ -517,8 +517,8 @@ export default function OnboardingPage() {
                 className={cn(
                   "flex items-center px-8 py-3 font-bold rounded-xl shadow-lg transition-all disabled:opacity-50 text-sm",
                   step === 3
-                    ? "bg-green-600 text-white shadow-green-200 hover:bg-green-700"
-                    : "bg-sky-600 text-white shadow-sky-200 hover:bg-sky-700"
+                    ? "bg-green-600 text-white  hover:bg-green-700"
+                    : "bg-sky-600 text-white  hover:bg-sky-700"
                 )}
               >
                 {loading ? (

@@ -103,12 +103,12 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
   ];
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl shadow-black/20 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40  animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-lg shadow-black/20 flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-300">
         {/* Header */}
         <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-sky-50/50">
           <div className="flex items-center space-x-3">
-            <div className="bg-sky-500 p-2 rounded-xl shadow-lg shadow-sky-100">
+            <div className="bg-sky-500 p-2 rounded-xl shadow-lg ">
               <FileText className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -124,7 +124,7 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
           {/* Description Box */}
-          <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+          <div className="bg-gray-50 p-5 rounded-lg border border-gray-100">
             <div className="flex items-start space-x-3">
               <Info className="h-5 w-5 text-sky-500 mt-0.5" />
               <div>
@@ -143,7 +143,7 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
                   key={opt.value}
                   onClick={() => setStatus(opt.value)}
                   className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all",
+                    "flex flex-col items-center justify-center p-3 rounded-lg border-2 transition-all",
                     status === opt.value
                       ? cn(opt.color, "ring-2 ring-offset-2 ring-sky-500")
                       : "bg-white border-gray-100 text-gray-400 hover:border-gray-200"
@@ -190,7 +190,7 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
+              className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all"
               placeholder="Add any internal notes or reminders here..."
             />
           </div>
@@ -210,7 +210,7 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
 
             <div className="space-y-2">
               {evidenceUrls.length === 0 ? (
-                <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-2xl">
+                <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-lg">
                   <FileText className="h-8 w-8 text-gray-200 mx-auto mb-2" />
                   <p className="text-sm text-gray-400">No documents uploaded yet.</p>
                 </div>
@@ -259,7 +259,7 @@ export default function DetailModal({ isOpen, onClose, item }: DetailModalProps)
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-sky-200 hover:bg-sky-700 transition-all disabled:opacity-50"
+            className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg  hover:bg-sky-700 transition-all disabled:opacity-50"
           >
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
             Save Changes

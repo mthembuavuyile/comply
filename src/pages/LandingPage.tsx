@@ -13,11 +13,11 @@ import {
   TrendingUp,
   AlertTriangle,
   FolderOpen,
-  Sparkles,
   Users,
   Coins,
   ClipboardList,
   Check,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../App";
@@ -396,7 +396,7 @@ export default function LandingPage() {
                   bg: "#fffbeb", color: "#d97706"
                 },
                 {
-                  icon: Sparkles,
+                  icon: MessageSquare,
                   title: "AI B-BBEE Copilot",
                   desc: "Consult our Gemini-powered AI advisor for natural language answers to complex point calculations, priority targets, and compliance queries.",
                   bg: "#e0e7ff", color: "#4338ca"

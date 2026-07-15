@@ -15,7 +15,6 @@ import {
   Calendar,
   CheckCircle,
   Bell,
-  Sparkles,
   TrendingUp,
   FileCheck,
   Users,
@@ -355,8 +354,8 @@ export default function DashboardPage() {
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <Building2 className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -365,7 +364,7 @@ export default function DashboardPage() {
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -385,7 +384,7 @@ export default function DashboardPage() {
                 {activeClient?.businessName || "ComplyOS"}
               </h1>
               {sectorLabel && (
-                <span className="px-3 py-1 bg-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-sky-200 shadow-sm shadow-sky-50/50">
+                <span className="px-3 py-1 bg-sky-100 text-sky-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-sky-200 shadow-sm ">
                   {sectorLabel}
                 </span>
               )}
@@ -397,9 +396,9 @@ export default function DashboardPage() {
           <div className="flex items-center space-x-3">
             <a
               href="/ai"
-              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-sky-100"
+              className="flex items-center gap-1.5 px-4 py-2  bg-sky-600  hover:bg-sky-700 hover: text-white text-xs font-bold rounded-xl transition-all shadow-md "
             >
-              <Sparkles className="h-4 w-4" />
+              
               <span>Ask AI BEE Copilot</span>
             </a>
           </div>
@@ -408,7 +407,7 @@ export default function DashboardPage() {
         {/* Level Radial Wheel & Score Summary cockpit */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Circular Wheel Gauge Card */}
-          <div className="bg-white p-8 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+          <div className="bg-white p-8 rounded-xl shadow-md  border border-gray-100 flex flex-col items-center justify-center text-center relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
               <a href="/calculator" className="p-1.5 text-gray-400 hover:text-sky-600 transition-colors">
                 <ArrowUpRight className="h-5 w-5" />
@@ -470,9 +469,9 @@ export default function DashboardPage() {
 
           {/* Quick Metrics Cockpit cards */}
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between group hover:scale-[1.01] transition-all">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-100 text-amber-500">
+                <div className="p-3 bg-amber-50 rounded-lg border border-amber-100 text-amber-500">
                   <Coins className="h-6 w-6" />
                 </div>
                 <div className="text-right">
@@ -490,9 +489,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between group hover:scale-[1.01] transition-all">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-500">
+                <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100 text-indigo-500">
                   <TrendingUp className="h-6 w-6" />
                 </div>
                 <div className="text-right">
@@ -510,9 +509,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between group hover:scale-[1.01] transition-all">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-rose-50 rounded-2xl border border-rose-100 text-rose-500">
+                <div className="p-3 bg-rose-50 rounded-lg border border-rose-100 text-rose-500">
                   <Users className="h-6 w-6" />
                 </div>
                 <div className="text-right">
@@ -535,9 +534,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between group hover:scale-[1.01] transition-all">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between group hover:scale-[1.01] transition-all">
               <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-500">
+                <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-emerald-500">
                   <CheckCircle className="h-6 w-6" />
                 </div>
                 <div className="text-right">
@@ -558,7 +557,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 5 Elements Scorecard Progress bars */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20">
+        <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-md ">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h3 className="text-lg font-black text-gray-900 tracking-tight">Scorecard Element Progress</h3>
@@ -613,7 +612,7 @@ export default function DashboardPage() {
         {/* Dynamic Risks Alert Board & Audit Checklist */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Dynamic B-BBEE Risks Card */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between">
             <div>
               <div className="flex items-center space-x-2 text-rose-600 mb-4">
                 <AlertTriangle className="h-5 w-5" />
@@ -633,7 +632,7 @@ export default function DashboardPage() {
                     <div
                       key={risk.id}
                       className={cn(
-                        "p-4 rounded-2xl border flex gap-3.5 transition-all hover:scale-[1.01] items-start",
+                        "p-4 rounded-lg border flex gap-3.5 transition-all hover:scale-[1.01] items-start",
                         risk.severity === "critical"
                           ? "bg-rose-50 border-rose-100 text-rose-900"
                           : risk.severity === "warning"
@@ -693,7 +692,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Interactive Checklist Tracker */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between">
             <div>
               <div className="flex items-center space-x-2 text-sky-600 mb-4">
                 <ListTodo className="h-5 w-5" />
@@ -702,7 +701,7 @@ export default function DashboardPage() {
               <p className="text-xs text-gray-400 font-medium mb-4">Step-by-step checklist to organize documents and verification requirements for SANAS audit agents.</p>
 
               {/* Progress Bar for Checklist */}
-              <div className="bg-sky-50/50 border border-sky-100 p-3 rounded-2xl flex items-center justify-between gap-4 mb-6">
+              <div className="bg-sky-50/50 border border-sky-100 p-3 rounded-lg flex items-center justify-between gap-4 mb-6">
                 <span className="text-xs font-bold text-sky-900">
                   {checklistCheckedCount} of {checklistTotalCount} actions complete
                 </span>
@@ -725,7 +724,7 @@ export default function DashboardPage() {
                       key={task.id}
                       onClick={() => handleToggleTask(task.id)}
                       className={cn(
-                        "w-full text-left p-3.5 rounded-2xl border transition-all flex items-start space-x-3 cursor-pointer",
+                        "w-full text-left p-3.5 rounded-lg border transition-all flex items-start space-x-3 cursor-pointer",
                         isChecked
                           ? "bg-emerald-50/30 border-emerald-100 text-gray-500 line-through decoration-gray-300"
                           : "bg-gray-50/30 border-gray-100 text-gray-800 hover:bg-gray-50/80"
@@ -759,7 +758,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Audit Timeline / Pipeline Project tracker */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20">
+        <div className="bg-white p-8 rounded-xl border border-gray-100 shadow-md ">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
               <h3 className="text-lg font-black text-gray-900 tracking-tight">Active Audit Pipeline Timeline</h3>
@@ -828,7 +827,7 @@ export default function DashboardPage() {
                     <div
                       key={stage.value}
                       className={cn(
-                        "p-4 rounded-2xl border transition-all flex flex-col justify-between h-20",
+                        "p-4 rounded-lg border transition-all flex flex-col justify-between h-20",
                         isCurrent
                           ? "bg-sky-50 border-sky-200 text-sky-900"
                           : isPast
@@ -839,7 +838,7 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between text-[10px] font-bold">
                         <span>Step {idx + 1}</span>
                         {isPast && <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />}
-                        {isCurrent && <Clock className="h-3.5 w-3.5 text-sky-600 animate-pulse" />}
+                        {isCurrent && <Clock className="h-3.5 w-3.5 text-sky-600 " />}
                       </div>
                       <span className="font-extrabold text-xs tracking-tight">{stage.label}</span>
                     </div>
@@ -848,7 +847,7 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-            <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-3xl flex flex-col items-center justify-center">
+            <div className="py-12 text-center text-gray-400 border-2 border-dashed border-gray-100 rounded-xl flex flex-col items-center justify-center">
               <Calendar className="h-10 w-10 text-gray-200 mb-3" />
               <h5 className="font-bold text-gray-800">No B-BBEE Audit Project Initialized</h5>
               <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto mb-4">Initialize an audit timeline to snap benchmark scorecards and track verification cycles.</p>

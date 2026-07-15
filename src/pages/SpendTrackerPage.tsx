@@ -18,7 +18,6 @@ import {
   HelpCircle,
   PiggyBank,
   Settings,
-  Sparkles,
   Upload,
 } from "lucide-react";
 import { cn, formatDate } from "../lib/utils";
@@ -207,8 +206,8 @@ export default function SpendTrackerPage() {
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <Coins className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -217,7 +216,7 @@ export default function SpendTrackerPage() {
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -237,7 +236,7 @@ export default function SpendTrackerPage() {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 hover:scale-[1.02] active:scale-95 transition-all font-bold text-sm"
+            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-lg shadow-lg  hover:bg-sky-700 hover:scale-[1.02]  transition-all font-bold text-sm"
           >
             <Plus className="h-4 w-4" />
             <span>Log Expenditure</span>
@@ -246,7 +245,7 @@ export default function SpendTrackerPage() {
 
         {/* Setup finances alert */}
         {showConfigAlert && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-3xl flex items-start space-x-3 text-amber-800 shadow-sm">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start space-x-3 text-amber-800 shadow-sm">
             <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0 animate-bounce" />
             <div>
               <h5 className="font-bold text-sm">Financial Setup Incomplete</h5>
@@ -260,7 +259,7 @@ export default function SpendTrackerPage() {
         {/* Finance Configuration & Global Spend Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Finance Config */}
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 lg:col-span-2">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  lg:col-span-2">
             <div className="flex items-center space-x-2 text-sky-600 mb-6">
               <Settings className="h-5 w-5" />
               <h4 className="font-extrabold text-gray-900">B-BBEE Base Targets Configuration</h4>
@@ -275,7 +274,7 @@ export default function SpendTrackerPage() {
                     required
                     value={payrollInput}
                     onChange={(e) => setPayrollInput(e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
+                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
                     placeholder="e.g. 5000000"
                   />
                 </div>
@@ -289,7 +288,7 @@ export default function SpendTrackerPage() {
                     required
                     value={npatInput}
                     onChange={(e) => setNpatInput(e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
+                    className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
                     placeholder="e.g. 1200000"
                   />
                 </div>
@@ -298,7 +297,7 @@ export default function SpendTrackerPage() {
                 <button
                   type="submit"
                   disabled={isUpdatingProfile}
-                  className="bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs py-3 px-6 rounded-2xl shadow-md transition-all disabled:bg-gray-400 flex items-center space-x-1.5"
+                  className="bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs py-3 px-6 rounded-lg shadow-md transition-all disabled:bg-gray-400 flex items-center space-x-1.5"
                 >
                   <Calculator className="h-4 w-4" />
                   <span>Update Targets</span>
@@ -308,7 +307,7 @@ export default function SpendTrackerPage() {
           </div>
 
           {/* Global Spend Monitor */}
-          <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-900 shadow-xl shadow-indigo-950/20 text-white flex flex-col justify-between relative overflow-hidden">
+          <div className=" bg-indigo-950  p-6 rounded-xl border border-indigo-900 shadow-md  text-white flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-5">
               <Coins className="h-32 w-32" />
             </div>
@@ -345,7 +344,7 @@ export default function SpendTrackerPage() {
             const isCompleted = actual >= target && target > 0;
 
             return (
-              <div key={cat.value} className="bg-white p-5 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col justify-between h-56 group">
+              <div key={cat.value} className="bg-white p-5 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between h-56 group">
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
@@ -384,7 +383,7 @@ export default function SpendTrackerPage() {
         </div>
 
         {/* Spend Log CRM / Table */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex items-center justify-between">
             <h3 className="text-lg font-black text-gray-900">Investment Ledger</h3>
             <span className="text-xs font-bold text-gray-400">{spendLogs.length} Transactions</span>
@@ -464,8 +463,8 @@ export default function SpendTrackerPage() {
 
         {/* Log Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-6 shadow-2xl relative">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-6 shadow-lg relative">
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h3 className="text-xl font-black text-gray-900">Log B-BBEE Expenditure</h3>
                 <button
@@ -482,7 +481,7 @@ export default function SpendTrackerPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as any)}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                   >
                     <option value="skills_development">Skills Development</option>
                     <option value="enterprise_development">Enterprise Development (ED)</option>
@@ -501,7 +500,7 @@ export default function SpendTrackerPage() {
                       min="0"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full pl-8 pr-4 py-3 bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                       placeholder="e.g. 50000"
                     />
                   </div>
@@ -515,7 +514,7 @@ export default function SpendTrackerPage() {
                       required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     />
                   </div>
                   <div className="space-y-1 flex flex-col justify-end">
@@ -523,7 +522,7 @@ export default function SpendTrackerPage() {
                       type="button"
                       disabled={isDummyUploading}
                       onClick={handleDummyUpload}
-                      className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs py-3 rounded-2xl shadow-md transition-all flex items-center justify-center space-x-1.5"
+                      className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs py-3 rounded-lg shadow-md transition-all flex items-center justify-center space-x-1.5"
                     >
                       {isDummyUploading ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -543,7 +542,7 @@ export default function SpendTrackerPage() {
                     type="text"
                     value={evidenceUrl}
                     onChange={(e) => setEvidenceUrl(e.target.value)}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="https://..."
                   />
                 </div>
@@ -555,7 +554,7 @@ export default function SpendTrackerPage() {
                     rows={2}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="e.g. Paid for Java Training course invoice #104"
                   />
                 </div>
@@ -564,13 +563,13 @@ export default function SpendTrackerPage() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-200 transition-colors text-sm"
+                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-2xl hover:bg-sky-700 shadow-md shadow-sky-200 transition-colors text-sm"
+                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-lg hover:bg-sky-700 shadow-md  transition-colors text-sm"
                   >
                     Log Spend
                   </button>

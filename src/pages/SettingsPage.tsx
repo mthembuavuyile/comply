@@ -29,7 +29,6 @@ import {
   MapPin,
   Landmark,
   AlertTriangle,
-  Sparkles,
   Key,
   Check,
   Eye,
@@ -84,7 +83,7 @@ export default function SettingsPage() {
                   className={cn(
                     "flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap",
                     activeTab === tab.id
-                      ? "bg-sky-600 text-white shadow-lg shadow-sky-100"
+                      ? "bg-sky-600 text-white shadow-lg "
                       : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -183,8 +182,8 @@ function BusinessProfileTab() {
 
   if (!activeClient) {
     return (
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center">
-        <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center">
+        <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
           <Building2 className="h-8 w-8 text-sky-400" />
         </div>
         <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -193,7 +192,7 @@ function BusinessProfileTab() {
         </p>
         <a
           href="/clients"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+          className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
         >
           Go to Clients Portfolio
         </a>
@@ -202,7 +201,7 @@ function BusinessProfileTab() {
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md  border border-gray-100 overflow-hidden">
       <div className="p-6 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-900">Business Profile</h2>
         <p className="text-sm text-gray-500 mt-1">Update your business details. Changes may affect your compliance roadmap.</p>
@@ -211,7 +210,7 @@ function BusinessProfileTab() {
       <div className="p-6 space-y-6">
         {/* Sector change warning */}
         {sectorChanged && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start space-x-3 animate-in fade-in duration-300">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start space-x-3 animate-in fade-in duration-300">
             <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-sm font-bold text-amber-900">Sector Change Detected</p>
@@ -330,7 +329,7 @@ function BusinessProfileTab() {
           </div>
 
           {/* CIPC */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 self-end">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100 self-end">
             <div>
               <h3 className="font-semibold text-gray-900 text-sm">CIPC Registered</h3>
             </div>
@@ -365,7 +364,7 @@ function BusinessProfileTab() {
         <button
           onClick={handleSave}
           disabled={saving || !form.businessName.trim()}
-          className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-sky-200 hover:bg-sky-700 transition-all disabled:opacity-50"
+          className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg  hover:bg-sky-700 transition-all disabled:opacity-50"
         >
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
           Save Changes
@@ -380,7 +379,7 @@ function BusinessProfileTab() {
 // ======================================================================
 function BillingTab() {
   return (
-    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md  border border-gray-100 overflow-hidden">
       <div className="p-6 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-900">Subscription & Billing</h2>
       </div>
@@ -392,7 +391,7 @@ function BillingTab() {
         <p className="text-gray-500 max-w-md mx-auto mb-8">
           Track your core compliance requirements at no cost. Upgrade for advanced features, team access, and integrations.
         </p>
-        <button className="px-8 py-3 bg-sky-600 text-white font-bold rounded-xl shadow-lg shadow-sky-200 hover:bg-sky-700 transition-all text-sm">
+        <button className="px-8 py-3 bg-sky-600 text-white font-bold rounded-xl shadow-lg  hover:bg-sky-700 transition-all text-sm">
           Upgrade to Pro — Coming Soon
         </button>
       </div>
@@ -405,12 +404,12 @@ function BillingTab() {
 // ======================================================================
 function ComingSoonTab({ title, description }: { title: string; description: string }) {
   return (
-    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md  border border-gray-100 overflow-hidden">
       <div className="p-6 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
       </div>
       <div className="p-12 text-center">
-        <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-sky-50 rounded-lg flex items-center justify-center mx-auto mb-4">
           <Bell className="h-8 w-8 text-sky-300" />
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Coming Soon</h3>
@@ -483,11 +482,11 @@ function IntegrationsTab() {
   return (
     <div className="space-y-6">
       {/* Gemini AI Config Section */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-md  border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-sky-500 animate-pulse" />
+              
               Gemini AI Integration
             </h2>
             <p className="text-sm text-gray-500 mt-1">Configure your Gemini 2.5 Flash API Key to run B-BBEE Copilot consulting and document OCR analysis.</p>
@@ -499,7 +498,7 @@ function IntegrationsTab() {
 
         <div className="p-6 space-y-6">
           {/* Status Message */}
-          <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-start space-x-3 text-xs text-gray-600">
+          <div className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex items-start space-x-3 text-xs text-gray-600">
             <AlertTriangle className="h-5 w-5 text-sky-500 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-bold text-gray-900">How ComplyOS resolves your API key:</p>
@@ -556,7 +555,7 @@ function IntegrationsTab() {
           {/* Test results */}
           {testResult && (
             <div className={cn(
-              "p-4 rounded-2xl border text-xs font-semibold flex items-start gap-3 animate-in fade-in duration-200",
+              "p-4 rounded-lg border text-xs font-semibold flex items-start gap-3 animate-in fade-in duration-200",
               testResult.success
                 ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                 : "bg-red-50 border-red-200 text-red-800"
@@ -592,7 +591,7 @@ function IntegrationsTab() {
           <button
             onClick={handleSave}
             disabled={!apiKey.trim()}
-            className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-sky-100 hover:bg-sky-700 transition-all disabled:opacity-50"
+            className="flex items-center px-8 py-2.5 bg-sky-600 text-white text-sm font-bold rounded-xl shadow-lg  hover:bg-sky-700 transition-all disabled:opacity-50"
           >
             {isSaved ? "Saved!" : "Save API Key"}
           </button>
@@ -608,7 +607,7 @@ function IntegrationsTab() {
 // ======================================================================
 function PracticeProfileTab() {
   return (
-    <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 text-center border border-gray-100">
+    <div className="bg-white rounded-xl shadow-md  p-8 text-center border border-gray-100">
       <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
       <h2 className="text-xl font-bold text-gray-900 mb-2">Practice Profile</h2>
       <p className="text-gray-500 mb-6">Manage your practice details and team members here.</p>

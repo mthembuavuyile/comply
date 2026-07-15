@@ -93,7 +93,7 @@ export default function ClientsPage() {
           </div>
           <button
             onClick={handleAddClient}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-sky-200/50"
+            className="flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl transition-all shadow-lg "
           >
             <Plus className="h-4 w-4" />
             Add Client
@@ -102,8 +102,8 @@ export default function ClientsPage() {
 
         {/* Stats Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/20 flex items-center gap-4">
-            <div className="p-3 bg-sky-50 rounded-2xl border border-sky-100">
+          <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-lg  flex items-center gap-4">
+            <div className="p-3 bg-sky-50 rounded-lg border border-sky-100">
               <Building2 className="h-6 w-6 text-sky-600" />
             </div>
             <div>
@@ -111,8 +111,8 @@ export default function ClientsPage() {
               <p className="text-2xl font-black text-gray-900">{stats.totalClients}</p>
             </div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/20 flex items-center gap-4">
-            <div className="p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
+          <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-lg  flex items-center gap-4">
+            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
               <LayoutGrid className="h-6 w-6 text-indigo-600" />
             </div>
             <div>
@@ -120,8 +120,8 @@ export default function ClientsPage() {
               <p className="text-2xl font-black text-gray-900">{stats.sectors}</p>
             </div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/20 flex items-center gap-4">
-            <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+          <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-lg  flex items-center gap-4">
+            <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
               <MapPin className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
@@ -132,7 +132,7 @@ export default function ClientsPage() {
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-lg shadow-gray-200/20">
+        <div className="bg-white p-5 rounded-lg border border-gray-100 shadow-lg ">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -179,8 +179,8 @@ export default function ClientsPage() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sky-500" />
           </div>
         ) : filteredClients.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center">
-            <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center">
+            <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
               <Building2 className="h-8 w-8 text-sky-400" />
             </div>
             <h3 className="text-xl font-black text-gray-900 mb-2">
@@ -194,7 +194,7 @@ export default function ClientsPage() {
             {clients.length === 0 && (
               <button
                 onClick={handleAddClient}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-sky-200/50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg "
               >
                 <Plus className="h-4 w-4" />
                 Add Your First Client
@@ -212,10 +212,10 @@ export default function ClientsPage() {
                   key={client.id}
                   onClick={() => handleSelectClient(client)}
                   className={cn(
-                    "group text-left bg-white p-6 rounded-2xl border shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl",
+                    "group text-left bg-white p-6 rounded-lg border shadow-lg transition-all hover:scale-[1.02] hover:shadow-md",
                     isActive
-                      ? "border-sky-300 shadow-sky-100/50 ring-2 ring-sky-100"
-                      : "border-gray-100 shadow-gray-200/20 hover:border-sky-200"
+                      ? "border-sky-300  ring-2 ring-sky-100"
+                      : "border-gray-100  hover:border-sky-200"
                   )}
                 >
                   {/* Header */}
@@ -284,9 +284,9 @@ export default function ClientsPage() {
             {/* Add Client card */}
             <button
               onClick={handleAddClient}
-              className="group text-left bg-gray-50/50 p-6 rounded-2xl border-2 border-dashed border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-all flex flex-col items-center justify-center min-h-[200px]"
+              className="group text-left bg-gray-50/50 p-6 rounded-lg border-2 border-dashed border-gray-200 hover:border-sky-300 hover:bg-sky-50/30 transition-all flex flex-col items-center justify-center min-h-[200px]"
             >
-              <div className="p-3 bg-white rounded-2xl border border-gray-200 group-hover:border-sky-200 group-hover:bg-sky-50 transition-all mb-3 shadow-sm">
+              <div className="p-3 bg-white rounded-lg border border-gray-200 group-hover:border-sky-200 group-hover:bg-sky-50 transition-all mb-3 shadow-sm">
                 <Plus className="h-6 w-6 text-gray-400 group-hover:text-sky-600 transition-colors" />
               </div>
               <p className="font-bold text-sm text-gray-500 group-hover:text-sky-700 transition-colors">

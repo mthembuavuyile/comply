@@ -13,7 +13,6 @@ import {
   ClipboardList,
   CheckCircle,
   Clock,
-  Sparkles,
   ArrowRight,
   ShieldCheck,
   TrendingUp,
@@ -203,8 +202,8 @@ export default function ScorecardProjectsPage() {
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <ClipboardList className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -213,7 +212,7 @@ export default function ScorecardProjectsPage() {
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -235,7 +234,7 @@ export default function ScorecardProjectsPage() {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 hover:scale-[1.02] active:scale-95 transition-all font-bold text-sm"
+            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-lg shadow-lg  hover:bg-sky-700 hover:scale-[1.02]  transition-all font-bold text-sm"
           >
             <Plus className="h-4 w-4" />
             <span>New Audit Project</span>
@@ -245,7 +244,7 @@ export default function ScorecardProjectsPage() {
         {/* Project Pipeline List */}
         <div className="space-y-8">
           {projects.length === 0 ? (
-            <div className="py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center">
+            <div className="py-20 bg-white rounded-xl border-2 border-dashed border-gray-100 flex flex-col items-center justify-center text-center">
               <ClipboardList className="h-12 w-12 text-gray-200 mb-4" />
               <h3 className="text-lg font-bold text-gray-900">No active B-BBEE audit projects</h3>
               <p className="text-gray-400 text-xs mt-1 max-w-xs">
@@ -260,7 +259,7 @@ export default function ScorecardProjectsPage() {
               return (
                 <div
                   key={project.id}
-                  className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 space-y-8 relative overflow-hidden group"
+                  className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  space-y-8 relative overflow-hidden group"
                 >
                   {/* Decorative background logo */}
                   <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none group-hover:scale-105 transition-transform duration-500">
@@ -270,7 +269,7 @@ export default function ScorecardProjectsPage() {
                   {/* Project Info Header */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
                     <div className="flex items-start space-x-4">
-                      <div className="p-4 bg-sky-50 rounded-2xl">
+                      <div className="p-4 bg-sky-50 rounded-lg">
                         <Award className="h-8 w-8 text-sky-600" />
                       </div>
                       <div>
@@ -294,7 +293,7 @@ export default function ScorecardProjectsPage() {
                       </div>
 
                       <div className={cn(
-                        "px-4 py-2 rounded-2xl border text-center flex flex-col justify-center min-w-[100px]",
+                        "px-4 py-2 rounded-lg border text-center flex flex-col justify-center min-w-[100px]",
                         project.projectedLevel === 9 ? "bg-red-50 text-red-700 border-red-200" : "bg-emerald-50 text-emerald-700 border-emerald-200"
                       )}>
                         <span className="text-[10px] font-black uppercase tracking-wider">Projected</span>
@@ -309,7 +308,7 @@ export default function ScorecardProjectsPage() {
                           title="Sync project scorecard with active CRM and log data"
                           className="flex items-center space-x-1.5 bg-gray-50 hover:bg-gray-100 text-gray-600 font-bold text-xs py-2 px-3.5 rounded-xl border border-gray-100 transition-colors"
                         >
-                          <Zap className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
+                          <Zap className="h-3.5 w-3.5 text-amber-500 " />
                           <span>Sync Score</span>
                         </button>
                         <button
@@ -336,8 +335,8 @@ export default function ScorecardProjectsPage() {
                           <div
                             key={stage.value}
                             className={cn(
-                              "p-4 rounded-3xl border transition-all flex flex-col justify-between relative h-28",
-                              isCurrent ? "bg-sky-50 text-sky-900 border-sky-200 scale-[1.01] shadow-sm shadow-sky-50" :
+                              "p-4 rounded-xl border transition-all flex flex-col justify-between relative h-28",
+                              isCurrent ? "bg-sky-50 text-sky-900 border-sky-200 scale-[1.01] shadow-sm " :
                               isPast ? "bg-emerald-50/50 text-emerald-900 border-emerald-100" :
                               "bg-gray-50/50 text-gray-400 border-gray-100"
                             )}
@@ -384,7 +383,7 @@ export default function ScorecardProjectsPage() {
                       <button
                         onClick={() => handleAdvanceStage(project)}
                         disabled={isCertified}
-                        className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-4 rounded-xl disabled:opacity-50 text-xs transition-colors flex items-center space-x-1 shadow-md shadow-sky-100"
+                        className="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 px-4 rounded-xl disabled:opacity-50 text-xs transition-colors flex items-center space-x-1 shadow-md "
                       >
                         <span>Advance Stage</span>
                         <ChevronRight className="h-4 w-4" />
@@ -399,8 +398,8 @@ export default function ScorecardProjectsPage() {
 
         {/* Modal Dialog Form */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl max-w-sm w-full p-6 space-y-6 shadow-2xl relative">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl max-w-sm w-full p-6 space-y-6 shadow-lg relative">
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h3 className="text-xl font-black text-gray-900">New Audit Project</h3>
                 <button
@@ -417,7 +416,7 @@ export default function ScorecardProjectsPage() {
                   <select
                     value={financialYear}
                     onChange={(e) => setFinancialYear(e.target.value)}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                   >
                     {["2025", "2026", "2027", "2028"].map((year) => (
                       <option key={year} value={year}>
@@ -427,8 +426,8 @@ export default function ScorecardProjectsPage() {
                   </select>
                 </div>
 
-                <div className="p-4 bg-sky-50 rounded-2xl text-[11px] text-sky-800 leading-relaxed flex items-start space-x-2">
-                  <Sparkles className="h-4 w-4 text-sky-600 mt-0.5 flex-shrink-0" />
+                <div className="p-4 bg-sky-50 rounded-lg text-[11px] text-sky-800 leading-relaxed flex items-start space-x-2">
+                  
                   <span>
                     Creating a project snapshots your current CRM and spend ledger points as a starting benchmark. You can sync points with live data at any time.
                   </span>
@@ -438,13 +437,13 @@ export default function ScorecardProjectsPage() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-200 transition-colors text-sm"
+                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-2xl hover:bg-sky-700 shadow-md shadow-sky-200 transition-colors text-sm"
+                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-lg hover:bg-sky-700 shadow-md  transition-colors text-sm"
                   >
                     Start Project
                   </button>

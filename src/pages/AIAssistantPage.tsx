@@ -8,7 +8,6 @@ import Layout from "../components/Layout";
 import {
   Send,
   Brain,
-  Sparkles,
   Paperclip,
   Upload,
   User,
@@ -341,9 +340,9 @@ Return a JSON object conforming exactly to this structure:
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
-            <Sparkles className="h-8 w-8 text-sky-400" />
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
+            
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
           <p className="text-gray-500 font-medium text-sm mb-6">
@@ -351,7 +350,7 @@ Return a JSON object conforming exactly to this structure:
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -376,11 +375,11 @@ Return a JSON object conforming exactly to this structure:
         {/* Main Grid split */}
         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chat Panel */}
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 flex flex-col min-h-0">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-md  flex flex-col min-h-0">
             {/* Chat header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0 bg-gray-50/50 rounded-t-3xl">
               <div className="flex items-center space-x-2">
-                <Brain className="h-5 w-5 text-sky-600 animate-pulse" />
+                <Brain className="h-5 w-5 text-sky-600 " />
                 <span className="font-extrabold text-gray-900">B-BBEE Consulting Chat</span>
               </div>
               <span className="text-[10px] bg-sky-100 text-sky-800 border border-sky-200 font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
@@ -409,9 +408,9 @@ Return a JSON object conforming exactly to this structure:
                     </div>
 
                     <div className={cn(
-                      "p-4 rounded-3xl text-sm leading-relaxed whitespace-pre-wrap select-text",
+                      "p-4 rounded-xl text-sm leading-relaxed whitespace-pre-wrap select-text",
                       isUser
-                        ? "bg-sky-600 text-white shadow-md shadow-sky-100 rounded-tr-none"
+                        ? "bg-sky-600 text-white shadow-md  rounded-tr-none"
                         : "bg-gray-50 border border-gray-100 text-gray-800 rounded-tl-none"
                     )}>
                       {msg.content}
@@ -425,7 +424,7 @@ Return a JSON object conforming exactly to this structure:
                   <div className="p-2 rounded-xl bg-indigo-50 text-indigo-700 flex-shrink-0">
                     <Bot className="h-4 w-4" />
                   </div>
-                  <div className="p-4 rounded-3xl bg-gray-50 border border-gray-100 text-gray-400 text-sm flex items-center space-x-2">
+                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-gray-400 text-sm flex items-center space-x-2">
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     <span>AI B-BBEE strategist is formulating a response...</span>
                   </div>
@@ -456,12 +455,12 @@ Return a JSON object conforming exactly to this structure:
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder="Ask about priority elements, targets, points calculations..."
-                className="flex-1 bg-gray-50 border-0 rounded-2xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all outline-none"
+                className="flex-1 bg-gray-50 border-0 rounded-lg py-3.5 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all outline-none"
               />
               <button
                 type="submit"
                 disabled={isSending || !chatInput.trim()}
-                className="bg-sky-600 hover:bg-sky-700 text-white p-3.5 rounded-2xl shadow-md disabled:bg-gray-300 transition-all active:scale-[0.97]"
+                className="bg-sky-600 hover:bg-sky-700 text-white p-3.5 rounded-lg shadow-md disabled:bg-gray-300 transition-all active:scale-[0.97]"
               >
                 <Send className="h-5 w-5" />
               </button>
@@ -469,11 +468,11 @@ Return a JSON object conforming exactly to this structure:
           </div>
 
           {/* AI OCR side panel */}
-          <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-900 shadow-xl shadow-indigo-950/20 text-white flex flex-col justify-between min-h-[500px]">
+          <div className=" bg-indigo-950  p-6 rounded-xl border border-indigo-900 shadow-md  text-white flex flex-col justify-between min-h-[500px]">
             <div>
               <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                 <div className="flex items-center space-x-2 text-indigo-400">
-                  <Sparkles className="h-5 w-5" />
+                  
                   <span className="text-xs font-black uppercase tracking-widest">AI Document OCR Extractor</span>
                 </div>
               </div>
@@ -486,7 +485,7 @@ Return a JSON object conforming exactly to this structure:
               <div className="space-y-4">
                 <h5 className="text-[10px] font-black uppercase tracking-wider text-indigo-300">Upload real document (PDF or Image)</h5>
                 
-                <div className="relative border border-white/10 hover:border-white/20 rounded-3xl p-6 text-center transition-all bg-white/5 group">
+                <div className="relative border border-white/10 hover:border-white/20 rounded-xl p-6 text-center transition-all bg-white/5 group">
                   <input
                     type="file"
                     accept="application/pdf,image/*"
@@ -518,7 +517,7 @@ Return a JSON object conforming exactly to this structure:
                   <button
                     onClick={() => handleOcrFileAnalysis(selectedFile)}
                     disabled={isOcrProcessing}
-                    className="w-full flex items-center justify-center space-x-2 bg-sky-600 hover:bg-sky-700 disabled:bg-gray-600 text-white font-bold text-xs py-3 px-4 rounded-2xl shadow-lg transition-all active:scale-[0.98]"
+                    className="w-full flex items-center justify-center space-x-2 bg-sky-600 hover:bg-sky-700 disabled:bg-gray-600 text-white font-bold text-xs py-3 px-4 rounded-lg shadow-lg transition-all active:scale-[0.98]"
                   >
                     {isOcrProcessing ? (
                       <>
@@ -527,7 +526,7 @@ Return a JSON object conforming exactly to this structure:
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-4 w-4 mr-2" />
+                        
                         <span>Analyze Document with Gemini</span>
                       </>
                     )}
@@ -549,7 +548,7 @@ Return a JSON object conforming exactly to this structure:
                       <span>Extracted: {ocrResult.docType}</span>
                     </div>
 
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 space-y-2 text-xs font-semibold">
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2 text-xs font-semibold">
                       {Object.entries(ocrResult.extractedFields).map(([key, val]) => (
                         <div key={key} className="flex justify-between py-1 border-b border-white/5">
                           <span className="text-indigo-300">{key}</span>
@@ -559,7 +558,7 @@ Return a JSON object conforming exactly to this structure:
                     </div>
                   </div>
                 ) : (
-                  <div className="py-16 text-center border border-dashed border-white/15 rounded-3xl p-6 flex flex-col items-center justify-center">
+                  <div className="py-16 text-center border border-dashed border-white/15 rounded-xl p-6 flex flex-col items-center justify-center">
                     <Paperclip className="h-10 w-10 text-white/20 mb-3" />
                     <p className="text-xs text-white/40">Upload a compliance document above to extract details</p>
                   </div>
@@ -572,7 +571,7 @@ Return a JSON object conforming exactly to this structure:
               <div className="pt-6 mt-6 border-t border-white/10">
                 <button
                   onClick={handleOcrAddToSystem}
-                  className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-2xl shadow-lg shadow-indigo-950 transition-all active:scale-[0.98]"
+                  className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-lg shadow-lg  transition-all active:scale-[0.98]"
                 >
                   <PlusCircle className="h-4 w-4" />
                   <span>Integrate into System</span>

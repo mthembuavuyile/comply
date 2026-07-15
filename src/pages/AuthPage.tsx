@@ -9,7 +9,7 @@ import {
   sendEmailVerification,
   signOut,
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Shield, Mail, Lock, Loader2, Eye, EyeOff, CheckCircle2, XCircle, Clock } from "lucide-react";
 
 // ─── Password Strength ────────────────────────────────────────────────────────
@@ -144,7 +144,7 @@ function VerificationPending({ email, onResend, onBack }: {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-10 px-8 shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100 text-center">
+        <div className="bg-white py-10 px-8 shadow-md  rounded-lg border border-gray-100 text-center">
           <div className="flex justify-center mb-5">
             <div className="bg-sky-100 p-4 rounded-full">
               <Mail className="h-10 w-10 text-sky-600" />
@@ -359,9 +359,9 @@ export default function AuthPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex justify-center">
-          <div className="bg-sky-600 p-3 rounded-2xl shadow-lg shadow-sky-200/50">
+          <Link to="/" className="bg-sky-600 p-3 rounded-lg shadow-lg hover:bg-sky-700 transition-colors">
             <Shield className="h-10 w-10 text-white" />
-          </div>
+          </Link>
         </div>
         <h2 className="mt-6 text-3xl font-extrabold text-gray-900 tracking-tight">
           {isLogin ? "Welcome back" : "Create your account"}
@@ -372,7 +372,7 @@ export default function AuthPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100">
+        <div className="bg-white py-8 px-4 shadow-md  sm:rounded-lg sm:px-10 border border-gray-100">
 
           <button
             onClick={handleGoogleLogin}

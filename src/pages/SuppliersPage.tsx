@@ -22,7 +22,6 @@ import {
   CheckCircle,
   HelpCircle,
   Brain,
-  Sparkles,
   ArrowRight,
   TrendingUp,
   RefreshCw,
@@ -290,8 +289,8 @@ Return a JSON object conforming exactly to this structure:
   if (!activeClient) {
     return (
       <Layout>
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 p-16 text-center max-w-2xl mx-auto my-12">
-          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-md  p-16 text-center max-w-2xl mx-auto my-12">
+          <div className="mx-auto w-16 h-16 bg-sky-50 rounded-lg border border-sky-100 flex items-center justify-center mb-6">
             <Building2 className="h-8 w-8 text-sky-400" />
           </div>
           <h3 className="text-xl font-black text-gray-900 mb-2">No Active Client Selected</h3>
@@ -300,7 +299,7 @@ Return a JSON object conforming exactly to this structure:
           </p>
           <a
             href="/clients"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl shadow-lg"
+            className="inline-flex items-center gap-2 px-5 py-2.5  bg-sky-600  hover:bg-sky-700 hover: text-white text-sm font-bold rounded-xl shadow-lg"
           >
             Go to Clients Portfolio
           </a>
@@ -320,7 +319,7 @@ Return a JSON object conforming exactly to this structure:
           </div>
           <button
             onClick={handleOpenAddModal}
-            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-2xl shadow-lg shadow-sky-100 hover:bg-sky-700 hover:scale-[1.02] active:scale-95 transition-all font-bold text-sm"
+            className="flex items-center justify-center space-x-2 bg-sky-600 text-white px-5 py-3 rounded-lg shadow-lg  hover:bg-sky-700 hover:scale-[1.02]  transition-all font-bold text-sm"
           >
             <Plus className="h-4 w-4" />
             <span>Add Supplier</span>
@@ -329,7 +328,7 @@ Return a JSON object conforming exactly to this structure:
 
         {/* Procurement Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Total Procurement Spend</p>
               <h3 className="text-3xl font-black text-gray-900 mt-2">
@@ -339,7 +338,7 @@ Return a JSON object conforming exactly to this structure:
             <p className="text-xs text-gray-400 font-semibold mt-4">Across {suppliers.length} active suppliers</p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-gray-400">BEE Weighted Recognition Spend</p>
               <h3 className="text-3xl font-black text-sky-600 mt-2">
@@ -354,7 +353,7 @@ Return a JSON object conforming exactly to this structure:
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 flex flex-col justify-between">
+          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-md  flex flex-col justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Effective Recognition Rate</p>
               <h3 className="text-3xl font-black text-emerald-600 mt-2">{effectiveRecognitionRate}%</h3>
@@ -370,7 +369,7 @@ Return a JSON object conforming exactly to this structure:
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Filters */}
-            <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-4">
+            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -378,7 +377,7 @@ Return a JSON object conforming exactly to this structure:
                   placeholder="Search suppliers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
                 />
               </div>
               <div className="relative flex items-center space-x-2">
@@ -386,7 +385,7 @@ Return a JSON object conforming exactly to this structure:
                 <select
                   value={filterLevel}
                   onChange={(e) => setFilterLevel(e.target.value)}
-                  className="bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                  className="bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
                 >
                   <option value="all">All BEE Levels</option>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => (
@@ -399,7 +398,7 @@ Return a JSON object conforming exactly to this structure:
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/20 overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-md  overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -500,12 +499,12 @@ Return a JSON object conforming exactly to this structure:
 
           {/* AI Scorecard Analysis Panel */}
           <div className="space-y-6">
-            <div className="bg-gradient-to-br from-indigo-950 to-slate-900 p-6 rounded-3xl border border-indigo-900 shadow-xl shadow-indigo-950/20 text-white relative overflow-hidden">
+            <div className=" bg-indigo-950  p-6 rounded-xl border border-indigo-900 shadow-md  text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 p-6 opacity-5">
                 <Brain className="h-32 w-32" />
               </div>
               <div className="flex items-center space-x-2 text-indigo-400 mb-4">
-                <Sparkles className="h-5 w-5" />
+                
                 <span className="text-xs font-black uppercase tracking-widest">Procurement Copilot</span>
               </div>
               <h4 className="text-xl font-bold mb-2">Score Optimization Insights</h4>
@@ -517,7 +516,7 @@ Return a JSON object conforming exactly to this structure:
                 <div className="mt-6 space-y-4">
                   <p className="text-xs font-black uppercase tracking-widest text-indigo-300">Suppliers Hurting Your Score</p>
                   {scoreKillers.map((s) => (
-                    <div key={s.id} className="p-3 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between">
+                    <div key={s.id} className="p-3 bg-white/5 border border-white/10 rounded-lg flex items-center justify-between">
                       <div>
                         <p className="text-sm font-bold text-white truncate max-w-[150px]">{s.name}</p>
                         <p className="text-[10px] text-indigo-300 font-medium">
@@ -542,8 +541,8 @@ Return a JSON object conforming exactly to this structure:
 
         {/* Modal Dialog Form */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-2xl relative">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4  animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 space-y-6 shadow-lg relative">
               <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <h3 className="text-xl font-black text-gray-900">
                   {editingSupplier ? "Edit Supplier Info" : "Register Supplier"}
@@ -558,10 +557,10 @@ Return a JSON object conforming exactly to this structure:
 
               {/* OCR Import Box */}
               {!editingSupplier && (
-                <div className="p-4 bg-sky-50 border border-sky-100 rounded-2xl space-y-3">
+                <div className="p-4 bg-sky-50 border border-sky-100 rounded-lg space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-sky-700">
-                      <Sparkles className="h-4 w-4" />
+                      
                       <span className="text-xs font-black uppercase tracking-wider">Fast-track with AI OCR</span>
                     </div>
                     <span className="text-[9px] bg-sky-200/70 text-sky-800 font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
@@ -610,7 +609,7 @@ Return a JSON object conforming exactly to this structure:
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="Enter supplier name"
                   />
                 </div>
@@ -621,7 +620,7 @@ Return a JSON object conforming exactly to this structure:
                     <select
                       value={beeLevel}
                       onChange={(e) => setBeeLevel(Number(e.target.value))}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(lvl => (
                         <option key={lvl} value={lvl}>
@@ -635,7 +634,7 @@ Return a JSON object conforming exactly to this structure:
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as any)}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all cursor-pointer"
                     >
                       <option value="EME">EME (Exempt Micro)</option>
                       <option value="QSE">QSE (Qualifying Small)</option>
@@ -653,7 +652,7 @@ Return a JSON object conforming exactly to this structure:
                       max="100"
                       value={blackOwnership}
                       onChange={(e) => setBlackOwnership(Number(e.target.value))}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     />
                   </div>
                   <div className="space-y-1">
@@ -664,7 +663,7 @@ Return a JSON object conforming exactly to this structure:
                       max="100"
                       value={blackWomenOwnership}
                       onChange={(e) => setBlackWomenOwnership(Number(e.target.value))}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     />
                   </div>
                 </div>
@@ -676,7 +675,7 @@ Return a JSON object conforming exactly to this structure:
                     min="0"
                     value={annualSpend}
                     onChange={(e) => setAnnualSpend(Number(e.target.value))}
-                    className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     placeholder="Spend in Rands"
                   />
                 </div>
@@ -688,7 +687,7 @@ Return a JSON object conforming exactly to this structure:
                       type="date"
                       value={expiryDate}
                       onChange={(e) => setExpiryDate(e.target.value)}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                     />
                   </div>
                   <div className="space-y-1">
@@ -697,7 +696,7 @@ Return a JSON object conforming exactly to this structure:
                       type="text"
                       value={certificateUrl}
                       onChange={(e) => setCertificateUrl(e.target.value)}
-                      className="w-full bg-gray-50 border-0 rounded-2xl py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      className="w-full bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                       placeholder="https://..."
                     />
                   </div>
@@ -707,13 +706,13 @@ Return a JSON object conforming exactly to this structure:
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-2xl hover:bg-gray-200 transition-colors text-sm"
+                    className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-2xl hover:bg-sky-700 shadow-md shadow-sky-200 transition-colors text-sm"
+                    className="flex-1 bg-sky-600 text-white font-bold py-3 rounded-lg hover:bg-sky-700 shadow-md  transition-colors text-sm"
                   >
                     Save Supplier
                   </button>

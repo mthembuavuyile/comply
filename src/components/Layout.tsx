@@ -21,9 +21,9 @@ import {
   Coins,
   ClipboardList,
   Calculator,
-  Sparkles,
   FolderOpen,
   Search,
+  MessageSquare,
   Plus,
   Check,
 } from "lucide-react";
@@ -76,7 +76,7 @@ export default function Layout({ children }: LayoutProps) {
 
   // --- Tools section ---
   const toolItems = [
-    { name: "AI BEE Copilot", path: "/ai", icon: Sparkles },
+    { name: "AI BEE Copilot", path: "/ai", icon: MessageSquare },
     { name: "Notifications", path: "/alerts", icon: Bell },
   ];
 
@@ -97,7 +97,7 @@ export default function Layout({ children }: LayoutProps) {
       className={cn(
         "flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-semibold transition-all group",
         location.pathname === item.path
-          ? "bg-sky-600 text-white shadow-lg shadow-sky-100"
+          ? "bg-sky-600 text-white shadow-lg "
           : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
       )}
     >
@@ -123,7 +123,7 @@ export default function Layout({ children }: LayoutProps) {
           setClientSearch("");
         }}
         className={cn(
-          "w-full flex items-center space-x-3 p-4 rounded-2xl border transition-all",
+          "w-full flex items-center space-x-3 p-4 rounded-lg border transition-all",
           isClientSwitcherOpen
             ? "bg-sky-100 border-sky-200"
             : "bg-sky-50 border-sky-100 hover:bg-sky-100"
@@ -150,7 +150,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Dropdown */}
       {isClientSwitcherOpen && (
-        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-gray-200 shadow-2xl shadow-gray-200/50 z-50 overflow-hidden">
+        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-lg border border-gray-200 shadow-lg  z-50 overflow-hidden">
           {/* Search */}
           {clients.length > 3 && (
             <div className="p-3 border-b border-gray-100">
@@ -246,7 +246,7 @@ export default function Layout({ children }: LayoutProps) {
       <aside className="hidden md:flex w-72 bg-white border-r border-gray-200 flex-col sticky top-0 h-screen">
         <div className="p-6 border-b border-gray-100">
           <Link to="/dashboard" className="flex items-center space-x-3">
-            <div className="bg-sky-500 p-2 rounded-lg shadow-md shadow-sky-100">
+            <div className="bg-sky-500 p-2 rounded-lg shadow-md ">
               <Shield className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 tracking-tight">ComplyOS</span>
@@ -291,7 +291,7 @@ export default function Layout({ children }: LayoutProps) {
         </Link>
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="p-2 rounded-lg bg-gray-50 text-gray-600 active:scale-95 transition-all"
+          className="p-2 rounded-lg bg-gray-50 text-gray-600  transition-all"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -315,14 +315,14 @@ export default function Layout({ children }: LayoutProps) {
       >
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center space-x-3">
-            <div className="bg-sky-500 p-2 rounded-lg shadow-md shadow-sky-100">
+            <div className="bg-sky-500 p-2 rounded-lg shadow-md ">
               <Shield className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900 tracking-tight">ComplyOS</span>
           </Link>
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 active:scale-95 transition-all"
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500  transition-all"
           >
             <X className="h-5 w-5" />
           </button>
