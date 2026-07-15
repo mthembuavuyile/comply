@@ -125,7 +125,7 @@ export default function NotFoundPage() {
       `}</style>
 
       <div className="not-found-container">
-        <motion.div 
+        <motion.div
           className="status-code"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.1, scale: 1 }}
@@ -152,8 +152,8 @@ export default function NotFoundPage() {
           </p>
 
           <div className="actions">
-            <button 
-              onClick={() => window.history.back()} 
+            <button
+              onClick={() => window.history.back()}
               className="btn btn-outline"
             >
               <ArrowLeft size={16} /> Go Back

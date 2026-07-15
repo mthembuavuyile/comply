@@ -340,18 +340,6 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        {/* TRUST STRIP */}
-        <div className="trust-bar">
-          <div className="trust-bar-inner">
-            <span className="trust-label">Trusted Practice Partners</span>
-            <div className="trust-logos">
-              <span className="trust-logo"><Users size={16} /> 50+ Accounting Practices</span>
-              <span className="trust-logo"><ShieldCheck size={16} /> Verified SANAS Formats</span>
-              <span className="trust-logo"><Building2 size={16} /> South African Corporates</span>
-            </div>
-          </div>
-        </div>
-
         {/* FEATURES OVERVIEW */}
         <section id="features" className="section">
           <div className="section-inner">
@@ -497,7 +485,7 @@ export default function LandingPage() {
 
         {/* FOOTER */}
         <footer className="footer">
-          <div className="f-grid">
+          <div className="f-grid" style={{ gridTemplateColumns: "1fr" }}>
             <div>
               <Link to="/" className="logo" style={{ marginBottom: 20 }}>
                 <div className="logo-mark">
@@ -505,36 +493,12 @@ export default function LandingPage() {
                 </div>
                 <span className="logo-text serif">Comply<span>OS</span></span>
               </Link>
-              <p className="f-copy">
+              <p className="f-copy" style={{ maxWidth: 400 }}>
                 B-BBEE compliance software and practice management tools for South African firms. A Vylex Technology Group product.
               </p>
             </div>
-            <div>
-              <h5 className="f-title">Platform</h5>
-              <ul className="f-links">
-                {["Client Portfolio", "Scorecard Engine", "Spend gap tracking", "Evidence Vault"].map(l => (
-                  <li key={l}><a href="#" className="f-link">{l}</a></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h5 className="f-title">Solutions</h5>
-              <ul className="f-links">
-                {["Accounting Practices", "BEE Consultants", "SANAS Auditors", "Enterprise Networks"].map(l => (
-                  <li key={l}><a href="#" className="f-link">{l}</a></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h5 className="f-title">Legal</h5>
-              <ul className="f-links">
-                {["Privacy Policy", "Terms of Service", "POPIA Compliance", "Contact Support"].map(l => (
-                  <li key={l}><a href="#" className="f-link">{l}</a></li>
-                ))}
-              </ul>
-            </div>
           </div>
-          <div style={{ maxWidth: 1280, margin: "60px auto 0", paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justify: "space-between", alignItems: "center" }}>
+          <div style={{ maxWidth: 1280, margin: "60px auto 0", paddingTop: 32, borderTop: "1px solid var(--line)", display: "flex", justify: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>© 2026 ComplyOS. Durban, South Africa.</span>
             <span style={{ fontSize: 13, color: "var(--muted)", fontWeight: 600 }}>
               Powered by{" "}
