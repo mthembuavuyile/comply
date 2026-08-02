@@ -380,12 +380,12 @@ Return a JSON object conforming exactly to this structure:
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 border-0 rounded-lg focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all text-sm font-semibold text-gray-700"
                 />
               </div>
-              <div className="relative flex items-center space-x-2">
+              <div className="relative flex items-center space-x-2 w-full sm:w-auto">
                 <Filter className="h-4 w-4 text-gray-400" />
                 <select
                   value={filterLevel}
                   onChange={(e) => setFilterLevel(e.target.value)}
-                  className="bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                  className="w-full sm:w-auto bg-gray-50 border-0 rounded-lg py-3 px-4 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-sky-500 cursor-pointer"
                 >
                   <option value="all">All BEE Levels</option>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((lvl) => (

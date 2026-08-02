@@ -361,7 +361,7 @@ Return a JSON object conforming exactly to this structure:
 
   return (
     <Layout>
-      <div className="space-y-8 max-w-7xl mx-auto h-[calc(100vh-160px)] flex flex-col">
+      <div className="space-y-8 max-w-7xl mx-auto h-auto lg:h-[calc(100vh-160px)] flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -375,7 +375,7 @@ Return a JSON object conforming exactly to this structure:
         {/* Main Grid split */}
         <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Chat Panel */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-md  flex flex-col min-h-0">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-md flex flex-col h-[600px] lg:h-auto lg:min-h-0">
             {/* Chat header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0 bg-gray-50/50 rounded-t-3xl">
               <div className="flex items-center space-x-2">

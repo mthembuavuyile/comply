@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef, useEffect } from "react";
+import React, { ReactNode, useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../App";
 import { useClient } from "../lib/clientContext";
@@ -65,6 +65,18 @@ export default function Layout({ children }: LayoutProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   const filteredClients = clients.filter(
     (c) => !clientSearch || c.businessName.toLowerCase().includes(clientSearch.toLowerCase())
